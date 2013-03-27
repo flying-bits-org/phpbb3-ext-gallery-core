@@ -1,0 +1,3 @@
+gallery_core_index_controller:
+    pattern: /gallery
+    defaults: { _controller: gallery.core.controller.index:show }

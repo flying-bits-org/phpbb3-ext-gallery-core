@@ -1,0 +1,17 @@
+imports:
+    - { resource: parameters.yml }
+
+services:
+    gallery.core.controller.index:
+        class: phpbb_ext_gallery_core_controller_index
+        arguments:
+            - @auth
+            - @cache
+            - @config
+            - @dbal.conn
+            - @request
+            - @template
+            - @user
+            - @controller.helper
+            - %core.root_path%
+            - %core.php_ext%
