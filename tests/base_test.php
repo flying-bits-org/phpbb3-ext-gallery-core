@@ -13,6 +13,7 @@ class phpbb_ext_gallery_tests_base_test extends phpbb_ext_gallery_test_case
 	{
 		$this->assertTrue(true);
 	}
+
 	public function test_false()
 	{
 		$this->assertFalse(false);
