@@ -21,9 +21,9 @@ before_script:
   - pyrus set auto_discover 1
   - pyrus install --force phpunit/DbUnit
   - phpenv rehash
-  - cd phpBB
+  - cd tests/vendor/phpBB3/phpBB
   - php ../composer.phar install --dev
-  - cd ..
+  - cd ../../../../
   - sh -c "if [ `php -r "echo (int) version_compare(PHP_VERSION, '5.3.19', '>=');"` = "1" ]; then travis/setup-webserver.sh; fi"
 
 script:
