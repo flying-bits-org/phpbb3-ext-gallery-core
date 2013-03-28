@@ -12,5 +12,12 @@ Enable in database by inserting a row into phpbb_ext
 
 And purging your cache.
 
-# License
+##Tests and Continuous Intergration
+
+[![Build Status](https://travis-ci.org/nickvergessen/phpbb3-ext-gallery-core.png?branch=develop)](https://travis-ci.org/nickvergessen/phpbb3-ext-gallery-core)
+
+We use Travis-CI as a continous intergtation server and phpunit for our unit testing. See more information on the [phpBB development wiki](https://wiki.phpbb.com/Unit_Tests).
+
+## License
+
 [GPLv2](license.txt)
