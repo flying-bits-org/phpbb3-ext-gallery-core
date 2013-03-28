@@ -1,0 +1,3 @@
+[submodule "tests/vendor/phpBB3"]
+	path = tests/vendor/phpBB3
+	url = git://github.com/phpbb/phpbb3.git
