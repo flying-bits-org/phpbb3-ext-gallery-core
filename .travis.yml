@@ -14,6 +14,10 @@ matrix:
     - php: 5.5
 
 before_script:
+  - cd ../
+  - mkdir gallery
+  - mv phpbb3-ext-gallery-core gallery/core
+  - cd gallery/core
   - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'DROP DATABASE IF EXISTS phpbb_tests;' -U postgres; fi"
   - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'create database phpbb_tests;' -U postgres; fi"
   - sh -c "if [ '$DB' = 'mysql' ]; then mysql -e 'create database IF NOT EXISTS phpbb_tests;'; fi"
