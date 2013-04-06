@@ -16,18 +16,8 @@ abstract class phpbb_ext_gallery_database_test_case extends phpbb_database_test_
 	{
 		parent::setUp();
 
-		$this->db = $this->new_dbal();
-
-		global $phpbb_root_path, $phpEx;
-
-		$config = new phpbb_config(array());
-		$db_tools = new phpbb_db_tools($this->db);
-		$table_prefix = 'phpbb_';
-
-		$migrator = new phpbb_db_migrator($config, $this->db, $db_tools, 'phpbb_migrations', $phpbb_root_path, $phpEx, $table_prefix, array());
-
-		$phpbb_extension_manager =  new phpbb_extension_manager(new phpbb_mock_container_builder(), $this->db, $config, $migrator, 'phpbb_ext', dirname(__FILE__) . '/', '.' . $phpEx, null);
-		$phpbb_extension_manager->enable('gallery/core');
+		global $db;
+		$db = $this->db = $this->new_dbal();
 	}
 
 	protected function create_connection_manager($config)
