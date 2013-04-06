@@ -21,17 +21,22 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	protected $db;
 
 	/** @var String */
-	protected $table;
+	protected $table_name;
+
+	/** @var String */
+	protected $item_class = 'phpbb_ext_gallery_core_nestedsets_item_abstract';
 
 	/**
 	* Column names in the table
-	* @var String
+	* @var array
 	*/
-	protected $item_id		= 'item_id';
-	protected $left_id		= 'left_id';
-	protected $right_id		= 'right_id';
-	protected $parent_id	= 'parent_id';
-	protected $item_parents	= 'item_parents';
+	protected $table_columns = array(
+		'item_id'	=> 'item_id',
+		'left_id'	=> 'left_id',
+		'right_id'	=> 'right_id',
+		'parent_id'	=> 'parent_id',
+		'item_parents'	=> 'item_parents',
+	);
 
 	/**
 	* Additional SQL restrictions
@@ -47,10 +52,115 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	protected $item_basic_data = array('*');
 
 	/**
+	* Delete an item from the nested set (also deletes the rows form the table)
+	*
+	* Also deletes all subitems from the nested set
+	*
+	* @param string		$operator		SQL operator that needs to be prepended to sql_where,
+	*									if it is not empty.
+	* @param string		$column_prefix	Prefix that needs to be prepended to column names
+	* @return bool True if the item was deleted
+	*/
+	protected function get_sql_where($operator = ' AND ', $column_prefix = '')
+	{
+		return !$this->sql_where ?: $operator . sprintf($this->sql_where, $column_prefix);
+	}
+
+	/**
 	* @inheritdoc
 	*/
 	public function move(phpbb_ext_gallery_core_nestedsets_item_interface $item, $delta)
 	{
+		if ($delta == 0)
+		{
+			return false;
+		}
+
+		$action = ($delta > 0) ? 'move_up' : 'move_down';
+		$delta = abs($delta);
+
+		/**
+		* Fetch all the siblings between the item's current spot
+		* and where we want to move it to. If there are less than $delta
+		* siblings between the current spot and the target then the
+		* item will move as far as possible
+		*/
+		$sql = 'SELECT ' . implode(', ', $this->table_columns) . '
+			FROM ' . $this->table_name . '
+			WHERE ' . $this->table_columns['parent_id'] . ' = ' . $item->get_parent_id() . '
+				' . $this->get_sql_where() . '
+				AND ';
+
+		if ($action == 'move_up')
+		{
+			$sql .= $this->table_columns['right_id'] . ' < ' . $item->get_right_id() . ' ORDER BY ' . $this->table_columns['right_id'] . ' DESC';
+		}
+		else
+		{
+			$sql .= $this->table_columns['left_id'] . ' > ' . $item->get_left_id() . ' ORDER BY ' . $this->table_columns['left_id'] . ' ASC';
+		}
+
+		$result = $this->db->sql_query_limit($sql, $delta);
+
+		$target = null;
+		while ($row = $this->db->sql_fetchrow($result))
+		{
+			$target = new $this->item_class($row);
+		}
+		$this->db->sql_freeresult($result);
+
+		if (is_null($target))
+		{
+			// The item is already on top or bottom
+			return false;
+		}
+
+		/**
+		* $left_id and $right_id define the scope of the items that are affected by the move.
+		* $diff_up and $diff_down are the values to substract or add to each item's left_id
+		* and right_id in order to move them up or down.
+		* $move_up_left and $move_up_right define the scope of the items that are moving
+		* up. Other items in the scope of ($left_id, $right_id) are considered to move down.
+		*/
+		if ($action == 'move_up')
+		{
+			$left_id = $target->get_left_id();
+			$right_id = $item->get_right_id();
+
+			$diff_up = $item->get_left_id() - $target->get_left_id();
+			$diff_down = $item->get_right_id() + 1 - $item->get_left_id();
+
+			$move_up_left = $item->get_left_id();
+			$move_up_right = $item->get_right_id();
+		}
+		else
+		{
+			$left_id = $item->get_left_id();
+			$right_id = $target->get_right_id();
+
+			$diff_up = $item->get_right_id() + 1 - $item->get_left_id();
+			$diff_down = $target->get_right_id() - $item->get_right_id();
+
+			$move_up_left = $item->get_right_id() + 1;
+			$move_up_right = $target->get_right_id();
+		}
+
+		// Now do the dirty job
+		$sql = 'UPDATE ' . $this->table_name . '
+			SET ' . $this->table_columns['left_id'] . ' = ' . $this->table_columns['left_id'] . ' + CASE
+				WHEN ' . $this->table_columns['left_id'] . " BETWEEN {$move_up_left} AND {$move_up_right} THEN -{$diff_up}
+				ELSE {$diff_down}
+			END,
+			" . $this->table_columns['right_id'] . ' = ' . $this->table_columns['right_id'] . ' + CASE
+				WHEN ' . $this->table_columns['right_id'] . " BETWEEN {$move_up_left} AND {$move_up_right} THEN -{$diff_up}
+				ELSE {$diff_down}
+			END,
+			" . $this->table_columns['item_parents'] . " = ''
+			WHERE
+				" . $this->table_columns['left_id'] . " BETWEEN {$left_id} AND {$right_id}
+				AND " . $this->table_columns['right_id'] . " BETWEEN {$left_id} AND {$right_id}
+				" . $this->get_sql_where();
+		$this->db->sql_query($sql);
 	}
 
 	/**
@@ -58,6 +168,7 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	*/
 	public function move_down(phpbb_ext_gallery_core_nestedsets_item_interface $item)
 	{
+		$this->move($item, -1);
 	}
 
 	/**
@@ -65,12 +176,20 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	*/
 	public function move_up(phpbb_ext_gallery_core_nestedsets_item_interface $item)
 	{
+		$this->move($item, 1);
 	}
 
 	/**
 	* @inheritdoc
 	*/
 	public function add(phpbb_ext_gallery_core_nestedsets_item_interface $item)
+	{
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function remove(phpbb_ext_gallery_core_nestedsets_item_interface $item)
 	{
 	}
 

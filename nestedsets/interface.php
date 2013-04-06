@@ -45,17 +45,27 @@ interface phpbb_ext_gallery_core_nestedsets_interface
 	/**
 	* Add an item at the end of the nested set
 	*
-	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item	The item to be add
+	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item	The item to be added
 	* @return bool True if the item was added
 	*/
 	public function add(phpbb_ext_gallery_core_nestedsets_item_interface $item);
 
 	/**
-	* Delete an item from the nested set
+	* Remove an item from the nested set
+	*
+	* Also removes all subitems from the nested set
+	*
+	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item	The item to be removed
+	* @return bool True if the item was removed
+	*/
+	public function remove(phpbb_ext_gallery_core_nestedsets_item_interface $item);
+
+	/**
+	* Delete an item from the nested set (also deletes the rows form the table)
 	*
 	* Also deletes all subitems from the nested set
 	*
-	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item	The item to be delete
+	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item	The item to be deleted
 	* @return bool True if the item was deleted
 	*/
 	public function delete(phpbb_ext_gallery_core_nestedsets_item_interface $item);
@@ -73,7 +83,7 @@ interface phpbb_ext_gallery_core_nestedsets_interface
 	* Add an item as child of a given parent
 	*
 	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$new_parent		The parent item
-	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item			The item to be add
+	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item			The item to be added
 	* @return bool True if the item was added
 	*/
 	public function add_child(phpbb_ext_gallery_core_nestedsets_item_interface $new_parent, phpbb_ext_gallery_core_nestedsets_item_interface $item);
@@ -81,8 +91,8 @@ interface phpbb_ext_gallery_core_nestedsets_interface
 	/**
 	* Delete an item from the nested set
 	*
-	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item		The item to be add
-	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$new_parent	The item to be add
+	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item		The item to be moved
+	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$new_parent	The new parent item
 	* @return bool True if the item was deleted
 	*/
 	public function change_parent(phpbb_ext_gallery_core_nestedsets_item_interface $item, phpbb_ext_gallery_core_nestedsets_item_interface $new_parent);
