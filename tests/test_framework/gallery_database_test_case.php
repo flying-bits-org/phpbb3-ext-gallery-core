@@ -6,7 +6,7 @@
 * @license http://opensource.org/licenses/gpl-2.0.php GNU General Public License v2
 *
 */
-require_once dirname(__FILE__) . '/../vendor/phpBB3/phpBB/includes/db/db_tools.php';
+require_once dirname(__FILE__) . '/../../../../../includes/db/db_tools.php';
 
 abstract class phpbb_ext_gallery_database_test_case extends phpbb_database_test_case
 {
