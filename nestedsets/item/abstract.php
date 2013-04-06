@@ -71,4 +71,12 @@ abstract class phpbb_ext_gallery_core_nestedsets_item_abstract implements phpbb_
 	{
 		return (int) $this->right_id;
 	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function has_children()
+	{
+		return $this->right_id - $this->left_id > 1;
+	}
 }

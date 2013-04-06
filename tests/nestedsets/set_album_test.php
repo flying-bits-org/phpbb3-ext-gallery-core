@@ -96,7 +96,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	{
 		return array(
 			array('Move first item up',
-				'phpbb_gallery_albums', 0, 1, 1, array(
+				'phpbb_gallery_albums', 0, 1, 1, false, array(
 				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
 				array('album_id' => 2, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
 				array('album_id' => 3, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
@@ -117,7 +117,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
 			)),
 			array('Move last item down',
-				'phpbb_gallery_albums', 0, 13, -1, array(
+				'phpbb_gallery_albums', 0, 13, -1, false, array(
 				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
 				array('album_id' => 2, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
 				array('album_id' => 3, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
@@ -138,7 +138,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
 			)),
 			array('Move first item down',
-				'phpbb_gallery_albums', 0, 1, -1, array(
+				'phpbb_gallery_albums', 0, 1, -1, true, array(
 				array('album_id' => 4, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
 				array('album_id' => 5, 'parent_id' => 4, 'user_id' => 0, 'left_id' => 2, 'right_id' => 5, 'album_parents' => ''),
 				array('album_id' => 6, 'parent_id' => 5, 'user_id' => 0, 'left_id' => 3, 'right_id' => 4, 'album_parents' => ''),
@@ -159,7 +159,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
 			)),
 			array('Move second item up',
-				'phpbb_gallery_albums', 0, 4, 1, array(
+				'phpbb_gallery_albums', 0, 4, 1, true, array(
 				array('album_id' => 4, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
 				array('album_id' => 5, 'parent_id' => 4, 'user_id' => 0, 'left_id' => 2, 'right_id' => 5, 'album_parents' => ''),
 				array('album_id' => 6, 'parent_id' => 5, 'user_id' => 0, 'left_id' => 3, 'right_id' => 4, 'album_parents' => ''),
@@ -180,7 +180,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
 			)),
 			array('Move last item up',
-				'phpbb_gallery_albums', 0, 13, 1, array(
+				'phpbb_gallery_albums', 0, 13, 1, true, array(
 				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
 				array('album_id' => 2, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
 				array('album_id' => 3, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
@@ -201,7 +201,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
 			)),
 			array('Move last item up by 2',
-				'phpbb_gallery_albums', 0, 13, 2, array(
+				'phpbb_gallery_albums', 0, 13, 2, true, array(
 				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
 				array('album_id' => 2, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
 				array('album_id' => 3, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
@@ -222,7 +222,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
 			)),
 			array('Move last item up by 100',
-				'phpbb_gallery_albums', 0, 13, 100, array(
+				'phpbb_gallery_albums', 0, 13, 100, true, array(
 				array('album_id' => 13, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 2, 'album_parents' => ''),
 				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 3, 'right_id' => 8, 'album_parents' => ''),
 				array('album_id' => 2, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
@@ -248,13 +248,13 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	/**
 	* @dataProvider move_data
 	*/
-	public function test_move($explain, $table, $user_id, $album_id, $delta, $expected)
+	public function test_move($explain, $table, $user_id, $album_id, $delta, $expected_moved, $expected)
 	{
 		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $table, $user_id);
 
 		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
 
-		$set->move($album, $delta);
+		$this->assertEquals($expected_moved, $set->move($album, $delta));
 
 		$result = $this->db->sql_query("SELECT album_id, parent_id, user_id, left_id, right_id, album_parents
 			FROM $table
@@ -266,7 +266,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	{
 		return array(
 			array('Move last item down',
-				'phpbb_gallery_albums', 0, 13, array(
+				'phpbb_gallery_albums', 0, 13, false, array(
 				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
 				array('album_id' => 2, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
 				array('album_id' => 3, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
@@ -287,7 +287,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
 			)),
 			array('Move first item down',
-				'phpbb_gallery_albums', 0, 1, array(
+				'phpbb_gallery_albums', 0, 1, true, array(
 				array('album_id' => 4, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
 				array('album_id' => 5, 'parent_id' => 4, 'user_id' => 0, 'left_id' => 2, 'right_id' => 5, 'album_parents' => ''),
 				array('album_id' => 6, 'parent_id' => 5, 'user_id' => 0, 'left_id' => 3, 'right_id' => 4, 'album_parents' => ''),
@@ -313,13 +313,13 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	/**
 	* @dataProvider move_down_data
 	*/
-	public function test_move_down($explain, $table, $user_id, $album_id, $expected)
+	public function test_move_down($explain, $table, $user_id, $album_id, $expected_moved, $expected)
 	{
 		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $table, $user_id);
 
 		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
 
-		$set->move_down($album);
+		$this->assertEquals($expected_moved, $set->move_down($album));
 
 		$result = $this->db->sql_query("SELECT album_id, parent_id, user_id, left_id, right_id, album_parents
 			FROM $table
@@ -331,7 +331,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	{
 		return array(
 			array('Move first item up',
-				'phpbb_gallery_albums', 0, 1, array(
+				'phpbb_gallery_albums', 0, 1, false, array(
 				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
 				array('album_id' => 2, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
 				array('album_id' => 3, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
@@ -352,7 +352,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
 			)),
 			array('Move second item up',
-				'phpbb_gallery_albums', 0, 4, array(
+				'phpbb_gallery_albums', 0, 4, true, array(
 				array('album_id' => 4, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
 				array('album_id' => 5, 'parent_id' => 4, 'user_id' => 0, 'left_id' => 2, 'right_id' => 5, 'album_parents' => ''),
 				array('album_id' => 6, 'parent_id' => 5, 'user_id' => 0, 'left_id' => 3, 'right_id' => 4, 'album_parents' => ''),
@@ -378,13 +378,13 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	/**
 	* @dataProvider move_up_data
 	*/
-	public function test_move_up($explain, $table, $user_id, $album_id, $expected)
+	public function test_move_up($explain, $table, $user_id, $album_id, $expected_moved, $expected)
 	{
 		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $table, $user_id);
 
 		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
 
-		$set->move_up($album);
+		$this->assertEquals($expected_moved, $set->move_up($album));
 
 		$result = $this->db->sql_query("SELECT album_id, parent_id, user_id, left_id, right_id, album_parents
 			FROM $table
@@ -457,7 +457,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	public function remove_data()
 	{
 		return array(
-			array('phpbb_gallery_albums', 0, 1, array(
+			array('phpbb_gallery_albums', 0, 1, array(1, 2, 3), array(
 				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 0, 'right_id' => 0, 'album_parents' => ''),
 				array('album_id' => 2, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 0, 'right_id' => 0, 'album_parents' => ''),
 				array('album_id' => 3, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 0, 'right_id' => 0, 'album_parents' => ''),
@@ -476,7 +476,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 				array('album_id' => 16, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
 				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
 			)),
-			array('phpbb_gallery_albums', 0, 2, array(
+			array('phpbb_gallery_albums', 0, 2, array(2), array(
 				array('album_id' => 2, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 0, 'right_id' => 0, 'album_parents' => ''),
 				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 4, 'album_parents' => ''),
 				array('album_id' => 3, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
@@ -501,13 +501,13 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	/**
 	* @dataProvider remove_data
 	*/
-	public function test_remove($table, $user_id, $album_id, $expected)
+	public function test_remove($table, $user_id, $album_id, $expected_removed, $expected)
 	{
 		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $table, $user_id);
 
 		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
 
-		$set->remove($album);
+		$this->assertEquals($expected_removed, $set->remove($album));
 
 		$result = $this->db->sql_query("SELECT album_id, parent_id, user_id, left_id, right_id, album_parents
 			FROM $table
@@ -518,7 +518,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	public function delete_data()
 	{
 		return array(
-			array('phpbb_gallery_albums', 0, 1, array(
+			array('phpbb_gallery_albums', 0, 1, array(1, 2, 3), array(
 				array('album_id' => 4, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
 				array('album_id' => 5, 'parent_id' => 4, 'user_id' => 0, 'left_id' => 2, 'right_id' => 5, 'album_parents' => ''),
 				array('album_id' => 6, 'parent_id' => 5, 'user_id' => 0, 'left_id' => 3, 'right_id' => 4, 'album_parents' => ''),
@@ -534,7 +534,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 				array('album_id' => 16, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
 				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
 			)),
-			array('phpbb_gallery_albums', 0, 2, array(
+			array('phpbb_gallery_albums', 0, 2, array(2), array(
 				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 4, 'album_parents' => ''),
 				array('album_id' => 3, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
 				array('album_id' => 4, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 5, 'right_id' => 10, 'album_parents' => ''),
@@ -558,13 +558,13 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	/**
 	* @dataProvider delete_data
 	*/
-	public function test_delete($table, $user_id, $album_id, $expected)
+	public function test_delete($table, $user_id, $album_id, $expected_deleted, $expected)
 	{
 		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $table, $user_id);
 
 		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
 
-		$set->delete($album);
+		$this->assertEquals($expected_deleted, $set->delete($album));
 
 		$result = $this->db->sql_query("SELECT album_id, parent_id, user_id, left_id, right_id, album_parents
 			FROM $table

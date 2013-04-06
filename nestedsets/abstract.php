@@ -161,6 +161,8 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 				AND " . $this->table_columns['right_id'] . " BETWEEN {$left_id} AND {$right_id}
 				" . $this->get_sql_where();
 		$this->db->sql_query($sql);
+
+		return true;
 	}
 
 	/**
@@ -168,7 +170,7 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	*/
 	public function move_down(phpbb_ext_gallery_core_nestedsets_item_interface $item)
 	{
-		$this->move($item, -1);
+		return $this->move($item, -1);
 	}
 
 	/**
@@ -176,7 +178,7 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	*/
 	public function move_up(phpbb_ext_gallery_core_nestedsets_item_interface $item)
 	{
-		$this->move($item, 1);
+		return $this->move($item, 1);
 	}
 
 	/**
@@ -191,8 +193,16 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	*/
 	public function remove(phpbb_ext_gallery_core_nestedsets_item_interface $item)
 	{
-		$items = array_keys($this->get_branch_data($item, 'children'));
-		$diff = sizeof($items) * 2;
+		if ($item->has_children())
+		{
+			$items = array_keys($this->get_branch_data($item, 'children'));
+			$diff = sizeof($items) * 2;
+		}
+		else
+		{
+			$items = array($item->get_item_id());
+			$diff = 2;
+		}
 
 		$sql_is_parent_sibling = $this->table_columns['left_id'] . ' < ' . $item->get_right_id() . '
 			AND ' . $this->table_columns['right_id'] . ' > ' . $item->get_right_id();
@@ -222,6 +232,8 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 			WHERE ' . $this->db->sql_in_set($this->table_columns['item_id'], $removed_items) . '
 			' . $this->get_sql_where('AND');
 		$this->db->sql_query($sql);
+
+		return $removed_items;
 	}
 
 	/**

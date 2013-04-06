@@ -51,4 +51,11 @@ interface phpbb_ext_gallery_core_nestedsets_item_interface
 	* @return int
 	*/
 	public function get_right_id();
+
+	/**
+	* Does the item have sub-items?
+	*
+	* @return bool
+	*/
+	public function has_children();
 }
