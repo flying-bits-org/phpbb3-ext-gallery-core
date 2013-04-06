@@ -391,4 +391,66 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 			ORDER BY user_id, left_id, album_id ASC");
 		$this->assertEquals($expected, $this->db->sql_fetchrowset($result));
 	}
+
+	public function get_branch_data()
+	{
+		return array(
+			array('phpbb_gallery_albums', 0, 1, 'all', true, true, array(1, 2, 3)),
+			array('phpbb_gallery_albums', 0, 1, 'all', true, false, array(2, 3)),
+			array('phpbb_gallery_albums', 0, 1, 'all', false, true, array(3, 2, 1)),
+			array('phpbb_gallery_albums', 0, 1, 'all', false, false, array(3, 2)),
+
+			array('phpbb_gallery_albums', 0, 1, 'parents', true, true, array(1)),
+			array('phpbb_gallery_albums', 0, 1, 'parents', true, false, array()),
+			array('phpbb_gallery_albums', 0, 1, 'parents', false, true, array(1)),
+			array('phpbb_gallery_albums', 0, 1, 'parents', false, false, array()),
+
+			array('phpbb_gallery_albums', 0, 1, 'children', true, true, array(1, 2, 3)),
+			array('phpbb_gallery_albums', 0, 1, 'children', true, false, array(2, 3)),
+			array('phpbb_gallery_albums', 0, 1, 'children', false, true, array(3, 2, 1)),
+			array('phpbb_gallery_albums', 0, 1, 'children', false, false, array(3, 2)),
+
+			array('phpbb_gallery_albums', 0, 2, 'all', true, true, array(1, 2)),
+			array('phpbb_gallery_albums', 0, 2, 'all', true, false, array(1)),
+			array('phpbb_gallery_albums', 0, 2, 'all', false, true, array(2, 1)),
+			array('phpbb_gallery_albums', 0, 2, 'all', false, false, array(1)),
+
+			array('phpbb_gallery_albums', 0, 2, 'parents', true, true, array(1, 2)),
+			array('phpbb_gallery_albums', 0, 2, 'parents', true, false, array(1)),
+			array('phpbb_gallery_albums', 0, 2, 'parents', false, true, array(2, 1)),
+			array('phpbb_gallery_albums', 0, 2, 'parents', false, false, array(1)),
+
+			array('phpbb_gallery_albums', 0, 2, 'children', true, true, array(2)),
+			array('phpbb_gallery_albums', 0, 2, 'children', true, false, array()),
+			array('phpbb_gallery_albums', 0, 2, 'children', false, true, array(2)),
+			array('phpbb_gallery_albums', 0, 2, 'children', false, false, array()),
+
+			array('phpbb_gallery_albums', 0, 5, 'all', true, true, array(4, 5, 6)),
+			array('phpbb_gallery_albums', 0, 5, 'all', true, false, array(4, 6)),
+			array('phpbb_gallery_albums', 0, 5, 'all', false, true, array(6, 5, 4)),
+			array('phpbb_gallery_albums', 0, 5, 'all', false, false, array(6, 4)),
+
+			array('phpbb_gallery_albums', 0, 5, 'parents', true, true, array(4, 5)),
+			array('phpbb_gallery_albums', 0, 5, 'parents', true, false, array(4)),
+			array('phpbb_gallery_albums', 0, 5, 'parents', false, true, array(5, 4)),
+			array('phpbb_gallery_albums', 0, 5, 'parents', false, false, array(4)),
+
+			array('phpbb_gallery_albums', 0, 5, 'children', true, true, array(5, 6)),
+			array('phpbb_gallery_albums', 0, 5, 'children', true, false, array(6)),
+			array('phpbb_gallery_albums', 0, 5, 'children', false, true, array(6, 5)),
+			array('phpbb_gallery_albums', 0, 5, 'children', false, false, array(6)),
+		);
+	}
+
+	/**
+	* @dataProvider get_branch_data
+	*/
+	public function test_get_branch($table, $user_id, $album_id, $type, $order_desc, $include_item, $expected)
+	{
+		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $table, $user_id);
+
+		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
+
+		$this->assertEquals($expected, array_keys($set->get_branch_data($album, $type, $order_desc, $include_item)));
+	}
 }

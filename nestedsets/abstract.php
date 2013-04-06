@@ -226,6 +226,45 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	*/
 	public function get_branch_data(phpbb_ext_gallery_core_nestedsets_item_interface $item, $type = 'all', $order_desc = true, $include_item = true)
 	{
+		switch ($type)
+		{
+			case 'parents':
+				$condition = 'i1.' . $this->table_columns['left_id'] . ' BETWEEN i2.' . $this->table_columns['left_id'] . ' AND i2.' . $this->table_columns['right_id'] . '';
+			break;
+
+			case 'children':
+				$condition = 'i2.' . $this->table_columns['left_id'] . ' BETWEEN i1.' . $this->table_columns['left_id'] . ' AND i1.' . $this->table_columns['right_id'] . '';
+			break;
+
+			default:
+				$condition = 'i2.' . $this->table_columns['left_id'] . ' BETWEEN i1.' . $this->table_columns['left_id'] . ' AND i1.' . $this->table_columns['right_id'] . '
+					OR i1.' . $this->table_columns['left_id'] . ' BETWEEN i2.' . $this->table_columns['left_id'] . ' AND i2.' . $this->table_columns['right_id'];
+			break;
+		}
+
+		$rows = array();
+
+		$sql = 'SELECT i2.*
+			FROM ' . $this->table_name . ' i1
+			LEFT JOIN ' . $this->table_name . " i2
+				ON (($condition) " . $this->get_sql_where(' AND ', 'i2.') . ')
+			WHERE i1.' . $this->table_columns['item_id'] . ' = ' . $item->get_item_id() . '
+				' . $this->get_sql_where(' AND ', 'i1.') . '
+			ORDER BY i2.' . $this->table_columns['left_id'] . ' ' . ($order_desc ? 'ASC' : 'DESC');
+		$result = $this->db->sql_query($sql);
+
+		while ($row = $this->db->sql_fetchrow($result))
+		{
+			if (!$include_item && $item->get_item_id() === (int) $row[$this->table_columns['item_id']])
+			{
+				continue;
+			}
+
+			$rows[$row[$this->table_columns['item_id']]] = $row;
+		}
+		$this->db->sql_freeresult($result);
+
+		return $rows;
 	}
 
 	/**
