@@ -61,9 +61,9 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	* @param string		$column_prefix	Prefix that needs to be prepended to column names
 	* @return bool True if the item was deleted
 	*/
-	protected function get_sql_where($operator = ' AND ', $column_prefix = '')
+	protected function get_sql_where($operator = 'AND', $column_prefix = '')
 	{
-		return !$this->sql_where ?: $operator . sprintf($this->sql_where, $column_prefix);
+		return !$this->sql_where ?: $operator . ' ' . sprintf($this->sql_where, $column_prefix);
 	}
 
 	/**
@@ -191,6 +191,24 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	*/
 	public function remove(phpbb_ext_gallery_core_nestedsets_item_interface $item)
 	{
+		$items = array_keys($this->get_branch_data($item, 'children'));
+		$diff = sizeof($items) * 2;
+
+		$sql_is_parent_sibling = $this->table_columns['left_id'] . ' < ' . $item->get_right_id() . '
+			AND ' . $this->table_columns['right_id'] . ' > ' . $item->get_right_id();
+
+		$sql_is_parent = $this->table_columns['left_id'] . ' > ' . $item->get_right_id();
+		$sql_remove_items = $this->db->sql_in_set($this->table_columns['item_id'], $items);
+
+		$sql = 'UPDATE ' . $this->table_name . '
+			SET ' . $this->table_columns['left_id'] . ' = ' . $this->db->sql_case($sql_is_parent, $this->table_columns['left_id'] . ' - ' . $diff, $this->db->sql_case($sql_remove_items, 0, $this->table_columns['left_id'])) . ',
+				' . $this->table_columns['right_id'] . ' = ' . $this->db->sql_case($sql_is_parent . ' OR ' . $sql_is_parent_sibling, $this->table_columns['right_id'] . ' - ' . $diff, $this->db->sql_case($sql_remove_items, 0, $this->table_columns['right_id'])) . ',
+				' . $this->table_columns['parent_id'] . ' = ' . $this->db->sql_case($sql_remove_items, 0, $this->table_columns['parent_id']) . ',
+				' . $this->table_columns['item_parents'] . " = ''
+			" . $this->get_sql_where('WHERE');
+		$this->db->sql_query($sql);
+
+		return $items;
 	}
 
 	/**
@@ -198,6 +216,12 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	*/
 	public function delete(phpbb_ext_gallery_core_nestedsets_item_interface $item)
 	{
+		$removed_items = $this->remove($item);
+
+		$sql = 'DELETE FROM ' . $this->table_name . '
+			WHERE ' . $this->db->sql_in_set($this->table_columns['item_id'], $removed_items) . '
+			' . $this->get_sql_where('AND');
+		$this->db->sql_query($sql);
 	}
 
 	/**

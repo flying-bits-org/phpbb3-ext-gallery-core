@@ -56,7 +56,7 @@ interface phpbb_ext_gallery_core_nestedsets_interface
 	* Also removes all subitems from the nested set
 	*
 	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item	The item to be removed
-	* @return bool True if the item was removed
+	* @return array		Items that have been removed
 	*/
 	public function remove(phpbb_ext_gallery_core_nestedsets_item_interface $item);
 
@@ -66,7 +66,7 @@ interface phpbb_ext_gallery_core_nestedsets_interface
 	* Also deletes all subitems from the nested set
 	*
 	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item	The item to be deleted
-	* @return bool True if the item was deleted
+	* @return array		Items that have been deleted
 	*/
 	public function delete(phpbb_ext_gallery_core_nestedsets_item_interface $item);
 
