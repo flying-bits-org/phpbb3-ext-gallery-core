@@ -44,7 +44,8 @@ class phpbb_ext_gallery_test_case_helpers extends phpbb_test_case_helpers
 
 			if (!function_exists('phpbb_convert_30_dbms_to_31'))
 			{
-				require_once dirname(__FILE__) . '/../vendor/phpBB3/phpBB/includes/functions.php';
+				global $phpbb_root_path;
+				require_once $phpbb_root_path . 'includes/functions.php';
 			}
 
 			$config = array_merge($config, array(
@@ -76,7 +77,8 @@ class phpbb_ext_gallery_test_case_helpers extends phpbb_test_case_helpers
 		{
 			if (!function_exists('phpbb_convert_30_dbms_to_31'))
 			{
-				require_once dirname(__FILE__) . '/../vendor/phpBB3/phpBB/includes/functions.php';
+				global $phpbb_root_path;
+				require_once $phpbb_root_path . 'includes/functions.php';
 			}
 
 			$config = array_merge($config, array(

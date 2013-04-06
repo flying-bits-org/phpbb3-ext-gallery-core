@@ -17,6 +17,7 @@ before_script:
   # checkout phpBB and move your extension in place
   - cd ../../
   - git clone "git://github.com/phpbb/phpbb3.git" "phpBB3"
+  - mkdir phpBB3/phpBB/ext
   - mkdir phpBB3/phpBB/ext/gallery
   - mv nickvergessen/phpbb3-ext-gallery-core phpBB3/phpBB/ext/gallery/core
 
