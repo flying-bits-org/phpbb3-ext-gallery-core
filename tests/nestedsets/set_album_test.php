@@ -392,7 +392,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 		$this->assertEquals($expected, $this->db->sql_fetchrowset($result));
 	}
 
-	public function get_branch_data()
+	public function get_branch_data_data()
 	{
 		return array(
 			array('phpbb_gallery_albums', 0, 1, 'all', true, true, array(1, 2, 3)),
@@ -443,15 +443,40 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	}
 
 	/**
-	* @dataProvider get_branch_data
+	* @dataProvider get_branch_data_data
 	*/
-	public function test_get_branch($table, $user_id, $album_id, $type, $order_desc, $include_item, $expected)
+	public function test_get_branch_data($table, $user_id, $album_id, $type, $order_desc, $include_item, $expected)
 	{
 		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $table, $user_id);
 
 		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
 
 		$this->assertEquals($expected, array_keys($set->get_branch_data($album, $type, $order_desc, $include_item)));
+	}
+
+	public function get_parent_data_data()
+	{
+		return array(
+			array('phpbb_gallery_albums', 0, 1, array(), array()),
+			array('phpbb_gallery_albums', 0, 1, array('album_parents' => serialize(array())), array()),
+			array('phpbb_gallery_albums', 0, 2, array(), array(1)),
+			array('phpbb_gallery_albums', 0, 2, array('album_parents' => serialize(array(1 => array()))), array(1)),
+			array('phpbb_gallery_albums', 0, 10, array(), array(7, 9)),
+			array('phpbb_gallery_albums', 0, 10, array('album_parents' => serialize(array(7 => array(), 9 => array()))), array(7, 9)),
+		);
+	}
+
+	/**
+	* @dataProvider get_parent_data_data
+	*/
+	public function test_get_parent_data($table, $user_id, $album_id, $album_data, $expected)
+	{
+		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $table, $user_id);
+
+		$data = array_merge($this->album_data[$album_id], $album_data);
+		$album = new phpbb_ext_gallery_core_nestedsets_item_album($data);
+
+		$this->assertEquals($expected, array_keys($set->get_parent_data($album)));
 	}
 
 	public function remove_data()

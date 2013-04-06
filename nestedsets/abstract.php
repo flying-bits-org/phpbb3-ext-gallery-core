@@ -283,9 +283,9 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 		$sql = 'SELECT i2.*
 			FROM ' . $this->table_name . ' i1
 			LEFT JOIN ' . $this->table_name . " i2
-				ON (($condition) " . $this->get_sql_where(' AND ', 'i2.') . ')
+				ON (($condition) " . $this->get_sql_where('AND', 'i2.') . ')
 			WHERE i1.' . $this->table_columns['item_id'] . ' = ' . $item->get_item_id() . '
-				' . $this->get_sql_where(' AND ', 'i1.') . '
+				' . $this->get_sql_where('AND', 'i1.') . '
 			ORDER BY i2.' . $this->table_columns['left_id'] . ' ' . ($order_desc ? 'ASC' : 'DESC');
 		$result = $this->db->sql_query($sql);
 
@@ -312,5 +312,38 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	*/
 	public function get_parent_data(phpbb_ext_gallery_core_nestedsets_item_interface $item)
 	{
+		$parents = array();
+		if ($item->get_parent_id())
+		{
+			if (!$item->get_item_parents_data())
+			{
+				$sql = 'SELECT ' . implode(', ', $this->item_basic_data) . '
+					FROM ' . $this->table_name . '
+					WHERE ' . $this->table_columns['left_id'] . ' < ' . $item->get_left_id() . '
+						AND ' . $this->table_columns['right_id'] . ' > ' . $item->get_right_id() . '
+						' . $this->get_sql_where('AND') . '
+					ORDER BY ' . $this->table_columns['left_id'] . ' ASC';
+				$result = $this->db->sql_query($sql);
+
+				while ($row = $this->db->sql_fetchrow($result))
+				{
+					$parents[$row[$this->table_columns['item_id']]] = $row;
+				}
+				$this->db->sql_freeresult($result);
+
+				$item_parents = serialize($parents);
+
+				$sql = 'UPDATE ' . $this->table_name . '
+					SET ' . $this->table_columns['item_parents'] . " = '" . $this->db->sql_escape($item_parents) . "'
+					WHERE " . $this->table_columns['parent_id'] . ' = ' . $item->get_parent_id();
+				$this->db->sql_query($sql);
+			}
+			else
+			{
+				$parents = unserialize($item->get_item_parents_data());
+			}
+		}
+
+		return $parents;
 	}
 }
