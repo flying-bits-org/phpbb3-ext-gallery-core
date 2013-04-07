@@ -13,7 +13,7 @@ abstract class phpbb_ext_gallery_test_case extends phpbb_test_case
 	{
 		if (!$this->test_case_helpers)
 		{
-			$this->test_case_helpers = new blog_test_case_helpers($this);
+			$this->test_case_helpers = new phpbb_ext_gallery_test_case_helpers($this);
 		}
 
 		return $this->test_case_helpers;
