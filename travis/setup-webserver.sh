@@ -11,7 +11,7 @@ sudo apt-get install -qq nginx realpath
 sudo service nginx stop
 
 DIR=$(dirname "$0")
-PHPBB_ROOT_PATH=$(realpath "$DIR/../tests/vendor/phpBB3/phpBB")
+PHPBB_ROOT_PATH=$(realpath "$DIR/../../../..")
 
 NGINX_CONF="/etc/nginx/sites-enabled/default"
 
