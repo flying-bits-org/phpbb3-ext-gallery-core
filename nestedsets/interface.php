@@ -89,13 +89,13 @@ interface phpbb_ext_gallery_core_nestedsets_interface
 	public function add_child(phpbb_ext_gallery_core_nestedsets_item_interface $new_parent, phpbb_ext_gallery_core_nestedsets_item_interface $item);
 
 	/**
-	* Delete an item from the nested set
+	* Set the parent item
 	*
 	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item		The item to be moved
 	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$new_parent	The new parent item
-	* @return bool True if the item was deleted
+	* @return bool True if the parent was set successfully
 	*/
-	public function change_parent(phpbb_ext_gallery_core_nestedsets_item_interface $item, phpbb_ext_gallery_core_nestedsets_item_interface $new_parent);
+	public function set_parent(phpbb_ext_gallery_core_nestedsets_item_interface $item, phpbb_ext_gallery_core_nestedsets_item_interface $new_parent);
 
 	/**
 	* Get branch of the item
