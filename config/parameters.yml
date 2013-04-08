@@ -1,1 +1,2 @@
 parameters:
+    tables.gallery.albums: %core.table_prefix%gallery_albums
