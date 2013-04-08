@@ -124,7 +124,14 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 			}
 			else
 			{
-				$sql = 'INSERT INTO ' . $this->table_name . ' ' . $this->db->sql_build_array('INSERT', $this->updated_data);
+				// Ensure that text columns are set, to prevent
+				// "Field does not have a default value" errors in strict mode
+				$album_data = array_merge(array(
+					'album_parents'		=> '',
+					'album_desc'		=> '',
+				), $this->updated_data);
+
+				$sql = 'INSERT INTO ' . $this->table_name . ' ' . $this->db->sql_build_array('INSERT', $album_data);
 				$this->db->sql_query($sql);
 
 				$this->data['album_id'] = (int) $this->db->sql_nextid();
@@ -132,6 +139,8 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 			}
 
 			$this->updated_data = array();
+
+			return true;
 		}
 
 		return false;

@@ -138,4 +138,28 @@ class phpbb_ext_gallery_tests_album_base_test extends phpbb_ext_gallery_database
 	{
 		 $this->album->set_values($values);
 	}
+
+	public function submit_data()
+	{
+		return array(
+			array(array('album_id' => 1, 'album_name' => 'category'), array('album_name' => 'foorbar'), true, 1),
+			array(array('album_id' => 1, 'album_name' => 'category'), array('album_name' => 'category'), false, 1),
+			array(array(), array('album_name' => 'foorbar'), true, 3),
+			array(array('album_name' => 'category'), array('album_name' => 'foorbar'), true, 3),
+		);
+	}
+
+	/**
+	* @dataProvider submit_data
+	*/
+	public function test_submit($current_data, $new_data, $expected_updated, $expected_id)
+	{
+		$this->album->set_datarow($current_data);
+
+		// Values were changed
+		$this->assertEquals($expected_updated, $this->album->set_values($new_data));
+		$this->assertEquals($expected_updated, $this->album->submit());
+		$this->assertFalse($this->album->set_values($new_data));
+		$this->assertFalse($this->album->submit());
+	}
 }
