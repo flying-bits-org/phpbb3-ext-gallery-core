@@ -2,7 +2,27 @@ imports:
     - { resource: parameters.yml }
 
 services:
-    gallery.core.controller.index:
+    gallery.album.factory:
+        class: phpbb_ext_gallery_core_album_factory
+        arguments:
+            - @dbal.conn
+            - @service_container
+            - @gallery.album.type_collection
+            - %tables.gallery.albums%
+
+    gallery.album.type_collection:
+        class: phpbb_di_service_collection
+        arguments:
+            - @service_container
+        tags:
+            - { name: service_collection, tag: gallery.album.type }
+
+    gallery.album.type.category:
+        class: phpbb_ext_gallery_core_album_category
+        tags:
+            - { name: gallery.album.type }
+
+    gallery.controller.index:
         class: phpbb_ext_gallery_core_controller_index
         arguments:
             - @auth
@@ -12,6 +32,7 @@ services:
             - @request
             - @template
             - @user
+            - @service_container
             - @controller.helper
             - %core.root_path%
             - %core.php_ext%
