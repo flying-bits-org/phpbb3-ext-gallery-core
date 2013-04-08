@@ -41,6 +41,7 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 	{
 		$this->db = $db;
 		$this->table_name = $table_name;
+		$this->data = $this->updated_data = array();
 	}
 
 	/**
