@@ -19,7 +19,7 @@ CREATE TABLE phpbb_gallery_albums (
 	right_id INT4 DEFAULT '2' NOT NULL CHECK (right_id >= 0),
 	user_id INT4 DEFAULT '0' NOT NULL CHECK (user_id >= 0),
 	album_parents TEXT DEFAULT '' NOT NULL,
-	album_type INT4 DEFAULT '1' NOT NULL CHECK (album_type >= 0),
+	album_type varchar(255) DEFAULT '' NOT NULL,
 	album_status INT4 DEFAULT '1' NOT NULL CHECK (album_status >= 0),
 	album_contest INT4 DEFAULT '0' NOT NULL CHECK (album_contest >= 0),
 	album_name varchar(255) DEFAULT '' NOT NULL,

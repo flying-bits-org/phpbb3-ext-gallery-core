@@ -810,7 +810,7 @@ function get_schema_struct()
 			'right_id'				=> array('UINT', 2),
 			'user_id'				=> array('UINT', 0),
 			'album_parents'			=> array('MTEXT_UNI', ''),
-			'album_type'			=> array('UINT:3', 1),
+			'album_type'			=> array('VCHAR:255',''),
 			'album_status'			=> array('UINT:1', 1),
 			'album_contest'			=> array('UINT', 0),
 			'album_name'			=> array('VCHAR:255', ''),
@@ -1103,5 +1103,3 @@ function custom_data($dbms)
 	// Just needed for new DBs, so phpBB already did this.
 	return '';
 }
-
-?>
