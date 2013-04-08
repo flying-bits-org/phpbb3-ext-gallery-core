@@ -138,12 +138,12 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 	}
 
 	/**
-	* @inheritdoc
-	*/
+	* Prevent fatal error:
+	* Can't inherit abstract function phpbb_ext_gallery_core_album_interface::get_type_id()
+	* (previously declared abstract in phpbb_ext_gallery_core_album_base) in
+	* album/base.php for php < 5.3.23
+	*
 	abstract function get_type_id();
-
-	/**
-	* @inheritdoc
-	*/
 	abstract function get_type_name();
+	*/
 }
