@@ -94,7 +94,7 @@ class phpbb_ext_gallery_core_album_factory
 
 		$type_object = $this->container->get('gallery.album.type.' . $type);
 		$type_class = get_class($type_object);
-		return new $type_class();
+		return new $type_class($this->db, $this->table_name);
 	}
 
 	/**

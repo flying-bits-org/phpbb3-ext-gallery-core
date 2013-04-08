@@ -28,7 +28,7 @@ class phpbb_ext_gallery_tests_album_factory_test extends phpbb_ext_gallery_datab
 		foreach ($types as $type)
 		{
 			$class_name = 'phpbb_ext_gallery_core_album_' . $type;
-			$type_class = new $class_name();
+			$type_class = new $class_name($this->db, 'phpbb_gallery_albums');
 			$type_collection[] = $type_class;
 			$container->set('gallery.album.type.' . $type, $type_class);
 		}

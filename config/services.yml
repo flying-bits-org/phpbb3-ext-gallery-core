@@ -19,6 +19,9 @@ services:
 
     gallery.album.type.category:
         class: phpbb_ext_gallery_core_album_category
+        arguments:
+            - @dbal.conn
+            - %tables.gallery.albums%
         tags:
             - { name: gallery.album.type }
 
