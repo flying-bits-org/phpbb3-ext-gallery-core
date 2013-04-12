@@ -29,11 +29,12 @@ class phpbb_ext_gallery_core_controller_index
 	* @param phpbb_request	$request	Request object
 	* @param phpbb_template	$template	Template object
 	* @param phpbb_user		$user		User object
+	* @param ContainerBuilder	$container	Container object
 	* @param phpbb_controller_helper		$helper		Controller helper object
 	* @param string			$root_path	phpBB root path
 	* @param string			$php_ext	phpEx
 	*/
-	public function __construct(phpbb_auth $auth, phpbb_cache_service $cache, phpbb_config $config, phpbb_db_driver $db, phpbb_request $request, phpbb_template $template, phpbb_user $user, phpbb_controller_helper $helper, $root_path, $php_ext)
+	public function __construct(phpbb_auth $auth, phpbb_cache_service $cache, phpbb_config $config, phpbb_db_driver $db, phpbb_request $request, phpbb_template $template, phpbb_user $user, Symfony\Component\DependencyInjection\ContainerBuilder $container, phpbb_controller_helper $helper, $root_path, $php_ext)
 	{
 		$this->auth = $auth;
 		$this->cache = $cache;
@@ -42,6 +43,7 @@ class phpbb_ext_gallery_core_controller_index
 		$this->request = $request;
 		$this->template = $template;
 		$this->user = $user;
+		$this->container = $container;
 		$this->helper = $helper;
 		$this->root_path = $root_path;
 		$this->php_ext = $php_ext;
