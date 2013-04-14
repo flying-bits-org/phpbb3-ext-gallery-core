@@ -47,6 +47,10 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 		15	=> array('album_id' => 15, 'parent_id' => 0, 'user_id' => 3, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
 		16	=> array('album_id' => 16, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
 		17	=> array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
+
+		// Albums that do not exist
+		0	=> array('album_id' => 0, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 0, 'right_id' => 0, 'album_parents' => ''),
+		200	=> array('album_id' => 200, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 0, 'right_id' => 0, 'album_parents' => ''),
 	);
 
 	public function album_constructor_data()
@@ -84,7 +88,9 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	*/
 	public function test_album_constructor($table, $user_id, $expected)
 	{
-		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $table, $user_id);
+		$config = new phpbb_config(array('phpbb_gallery_album_lock' => 0));
+		$lock = new phpbb_lock_db('phpbb_gallery_album_lock', $config, $this->db);
+		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $lock, $table, $user_id);
 
 		$result = $this->db->sql_query("SELECT album_id, parent_id, user_id, left_id, right_id, album_parents
 			FROM $table
@@ -250,7 +256,9 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	*/
 	public function test_move($explain, $table, $user_id, $album_id, $delta, $expected_moved, $expected)
 	{
-		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $table, $user_id);
+		$config = new phpbb_config(array('phpbb_gallery_album_lock' => 0));
+		$lock = new phpbb_lock_db('phpbb_gallery_album_lock', $config, $this->db);
+		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $lock, $table, $user_id);
 
 		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
 
@@ -315,7 +323,9 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	*/
 	public function test_move_down($explain, $table, $user_id, $album_id, $expected_moved, $expected)
 	{
-		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $table, $user_id);
+		$config = new phpbb_config(array('phpbb_gallery_album_lock' => 0));
+		$lock = new phpbb_lock_db('phpbb_gallery_album_lock', $config, $this->db);
+		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $lock, $table, $user_id);
 
 		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
 
@@ -380,7 +390,9 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	*/
 	public function test_move_up($explain, $table, $user_id, $album_id, $expected_moved, $expected)
 	{
-		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $table, $user_id);
+		$config = new phpbb_config(array('phpbb_gallery_album_lock' => 0));
+		$lock = new phpbb_lock_db('phpbb_gallery_album_lock', $config, $this->db);
+		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $lock, $table, $user_id);
 
 		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
 
@@ -447,7 +459,9 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	*/
 	public function test_get_branch_data($table, $user_id, $album_id, $type, $order_desc, $include_item, $expected)
 	{
-		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $table, $user_id);
+		$config = new phpbb_config(array('phpbb_gallery_album_lock' => 0));
+		$lock = new phpbb_lock_db('phpbb_gallery_album_lock', $config, $this->db);
+		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $lock, $table, $user_id);
 
 		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
 
@@ -471,7 +485,9 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	*/
 	public function test_get_parent_data($table, $user_id, $album_id, $album_data, $expected)
 	{
-		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $table, $user_id);
+		$config = new phpbb_config(array('phpbb_gallery_album_lock' => 0));
+		$lock = new phpbb_lock_db('phpbb_gallery_album_lock', $config, $this->db);
+		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $lock, $table, $user_id);
 
 		$data = array_merge($this->album_data[$album_id], $album_data);
 		$album = new phpbb_ext_gallery_core_nestedsets_item_album($data);
@@ -528,7 +544,9 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	*/
 	public function test_remove($table, $user_id, $album_id, $expected_removed, $expected)
 	{
-		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $table, $user_id);
+		$config = new phpbb_config(array('phpbb_gallery_album_lock' => 0));
+		$lock = new phpbb_lock_db('phpbb_gallery_album_lock', $config, $this->db);
+		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $lock, $table, $user_id);
 
 		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
 
@@ -585,7 +603,9 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 	*/
 	public function test_delete($table, $user_id, $album_id, $expected_deleted, $expected)
 	{
-		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $table, $user_id);
+		$config = new phpbb_config(array('phpbb_gallery_album_lock' => 0));
+		$lock = new phpbb_lock_db('phpbb_gallery_album_lock', $config, $this->db);
+		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $lock, $table, $user_id);
 
 		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
 
@@ -595,5 +615,245 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_test extends phpbb_ext_galler
 			FROM $table
 			ORDER BY user_id, left_id, album_id ASC");
 		$this->assertEquals($expected, $this->db->sql_fetchrowset($result));
+	}
+
+	public function move_children_data()
+	{
+		return array(
+			array('Item has no children',
+				'phpbb_gallery_albums', 0, 2, 1, false, array(
+				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
+				array('album_id' => 2, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
+				array('album_id' => 3, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
+
+				array('album_id' => 4, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 7, 'right_id' => 12, 'album_parents' => ''),
+				array('album_id' => 5, 'parent_id' => 4, 'user_id' => 0, 'left_id' => 8, 'right_id' => 11, 'album_parents' => ''),
+				array('album_id' => 6, 'parent_id' => 5, 'user_id' => 0, 'left_id' => 9, 'right_id' => 10, 'album_parents' => ''),
+
+				array('album_id' => 7, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 13, 'right_id' => 22, 'album_parents' => ''),
+				array('album_id' => 8, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 14, 'right_id' => 15, 'album_parents' => ''),
+				array('album_id' => 9, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 16, 'right_id' => 19, 'album_parents' => ''),
+				array('album_id' => 10, 'parent_id' => 9, 'user_id' => 0, 'left_id' => 17, 'right_id' => 18, 'album_parents' => ''),
+				array('album_id' => 11, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 20, 'right_id' => 21, 'album_parents' => ''),
+
+				array('album_id' => 12, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 23, 'right_id' => 24, 'album_parents' => ''),
+				array('album_id' => 13, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 25, 'right_id' => 26, 'album_parents' => ''),
+
+				array('album_id' => 14, 'parent_id' => 0, 'user_id' => 2, 'left_id' => 1, 'right_id' => 2, 'album_parents' => ''),
+
+				array('album_id' => 15, 'parent_id' => 0, 'user_id' => 3, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
+				array('album_id' => 16, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
+				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
+			)),
+			array('Move single child up',
+				'phpbb_gallery_albums', 0, 5, 1, true, array(
+				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 8, 'album_parents' => ''),
+				array('album_id' => 2, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
+				array('album_id' => 3, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
+				array('album_id' => 6, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 6, 'right_id' => 7, 'album_parents' => ''),
+
+				array('album_id' => 4, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 9, 'right_id' => 12, 'album_parents' => ''),
+				array('album_id' => 5, 'parent_id' => 4, 'user_id' => 0, 'left_id' => 10, 'right_id' => 11, 'album_parents' => ''),
+
+				array('album_id' => 7, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 13, 'right_id' => 22, 'album_parents' => ''),
+				array('album_id' => 8, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 14, 'right_id' => 15, 'album_parents' => ''),
+				array('album_id' => 9, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 16, 'right_id' => 19, 'album_parents' => ''),
+				array('album_id' => 10, 'parent_id' => 9, 'user_id' => 0, 'left_id' => 17, 'right_id' => 18, 'album_parents' => ''),
+				array('album_id' => 11, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 20, 'right_id' => 21, 'album_parents' => ''),
+
+				array('album_id' => 12, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 23, 'right_id' => 24, 'album_parents' => ''),
+				array('album_id' => 13, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 25, 'right_id' => 26, 'album_parents' => ''),
+
+				array('album_id' => 14, 'parent_id' => 0, 'user_id' => 2, 'left_id' => 1, 'right_id' => 2, 'album_parents' => ''),
+
+				array('album_id' => 15, 'parent_id' => 0, 'user_id' => 3, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
+				array('album_id' => 16, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
+				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
+			)),
+			array('Move nested children up',
+				'phpbb_gallery_albums', 0, 4, 1, true, array(
+				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 10, 'album_parents' => ''),
+				array('album_id' => 2, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
+				array('album_id' => 3, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
+				array('album_id' => 5, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 6, 'right_id' => 9, 'album_parents' => ''),
+				array('album_id' => 6, 'parent_id' => 5, 'user_id' => 0, 'left_id' => 7, 'right_id' => 8, 'album_parents' => ''),
+
+				array('album_id' => 4, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 11, 'right_id' => 12, 'album_parents' => ''),
+
+				array('album_id' => 7, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 13, 'right_id' => 22, 'album_parents' => ''),
+				array('album_id' => 8, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 14, 'right_id' => 15, 'album_parents' => ''),
+				array('album_id' => 9, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 16, 'right_id' => 19, 'album_parents' => ''),
+				array('album_id' => 10, 'parent_id' => 9, 'user_id' => 0, 'left_id' => 17, 'right_id' => 18, 'album_parents' => ''),
+				array('album_id' => 11, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 20, 'right_id' => 21, 'album_parents' => ''),
+
+				array('album_id' => 12, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 23, 'right_id' => 24, 'album_parents' => ''),
+				array('album_id' => 13, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 25, 'right_id' => 26, 'album_parents' => ''),
+
+				array('album_id' => 14, 'parent_id' => 0, 'user_id' => 2, 'left_id' => 1, 'right_id' => 2, 'album_parents' => ''),
+
+				array('album_id' => 15, 'parent_id' => 0, 'user_id' => 3, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
+				array('album_id' => 16, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
+				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
+			)),
+			array('Move single child down',
+				'phpbb_gallery_albums', 0, 5, 7, true, array(
+				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
+				array('album_id' => 2, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
+				array('album_id' => 3, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
+
+				array('album_id' => 4, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 7, 'right_id' => 10, 'album_parents' => ''),
+				array('album_id' => 5, 'parent_id' => 4, 'user_id' => 0, 'left_id' => 8, 'right_id' => 9, 'album_parents' => ''),
+
+				array('album_id' => 7, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 11, 'right_id' => 22, 'album_parents' => ''),
+				array('album_id' => 8, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 12, 'right_id' => 13, 'album_parents' => ''),
+				array('album_id' => 9, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 14, 'right_id' => 17, 'album_parents' => ''),
+				array('album_id' => 10, 'parent_id' => 9, 'user_id' => 0, 'left_id' => 15, 'right_id' => 16, 'album_parents' => ''),
+				array('album_id' => 11, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 18, 'right_id' => 19, 'album_parents' => ''),
+				array('album_id' => 6, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 20, 'right_id' => 21, 'album_parents' => ''),
+
+				array('album_id' => 12, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 23, 'right_id' => 24, 'album_parents' => ''),
+				array('album_id' => 13, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 25, 'right_id' => 26, 'album_parents' => ''),
+
+				array('album_id' => 14, 'parent_id' => 0, 'user_id' => 2, 'left_id' => 1, 'right_id' => 2, 'album_parents' => ''),
+
+				array('album_id' => 15, 'parent_id' => 0, 'user_id' => 3, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
+				array('album_id' => 16, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
+				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
+			)),
+			array('Move nested children down',
+				'phpbb_gallery_albums', 0, 4, 7, true, array(
+				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
+				array('album_id' => 2, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
+				array('album_id' => 3, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
+
+				array('album_id' => 4, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 7, 'right_id' => 8, 'album_parents' => ''),
+
+				array('album_id' => 7, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 9, 'right_id' => 22, 'album_parents' => ''),
+				array('album_id' => 8, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 10, 'right_id' => 11, 'album_parents' => ''),
+				array('album_id' => 9, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 12, 'right_id' => 15, 'album_parents' => ''),
+				array('album_id' => 10, 'parent_id' => 9, 'user_id' => 0, 'left_id' => 13, 'right_id' => 14, 'album_parents' => ''),
+				array('album_id' => 11, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 16, 'right_id' => 17, 'album_parents' => ''),
+				array('album_id' => 5, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 18, 'right_id' => 21, 'album_parents' => ''),
+				array('album_id' => 6, 'parent_id' => 5, 'user_id' => 0, 'left_id' => 19, 'right_id' => 20, 'album_parents' => ''),
+
+				array('album_id' => 12, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 23, 'right_id' => 24, 'album_parents' => ''),
+				array('album_id' => 13, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 25, 'right_id' => 26, 'album_parents' => ''),
+
+				array('album_id' => 14, 'parent_id' => 0, 'user_id' => 2, 'left_id' => 1, 'right_id' => 2, 'album_parents' => ''),
+
+				array('album_id' => 15, 'parent_id' => 0, 'user_id' => 3, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
+				array('album_id' => 16, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
+				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
+			)),
+			array('Move single child to parent 0',
+				'phpbb_gallery_albums', 0, 5, 0, true, array(
+				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
+				array('album_id' => 2, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
+				array('album_id' => 3, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
+
+				array('album_id' => 4, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 7, 'right_id' => 10, 'album_parents' => ''),
+				array('album_id' => 5, 'parent_id' => 4, 'user_id' => 0, 'left_id' => 8, 'right_id' => 9, 'album_parents' => ''),
+
+				array('album_id' => 7, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 11, 'right_id' => 20, 'album_parents' => ''),
+				array('album_id' => 8, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 12, 'right_id' => 13, 'album_parents' => ''),
+				array('album_id' => 9, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 14, 'right_id' => 17, 'album_parents' => ''),
+				array('album_id' => 10, 'parent_id' => 9, 'user_id' => 0, 'left_id' => 15, 'right_id' => 16, 'album_parents' => ''),
+				array('album_id' => 11, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 18, 'right_id' => 19, 'album_parents' => ''),
+
+				array('album_id' => 12, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 21, 'right_id' => 22, 'album_parents' => ''),
+				array('album_id' => 13, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 23, 'right_id' => 24, 'album_parents' => ''),
+				array('album_id' => 6, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 25, 'right_id' => 26, 'album_parents' => ''),
+
+				array('album_id' => 14, 'parent_id' => 0, 'user_id' => 2, 'left_id' => 1, 'right_id' => 2, 'album_parents' => ''),
+
+				array('album_id' => 15, 'parent_id' => 0, 'user_id' => 3, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
+				array('album_id' => 16, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
+				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
+			)),
+			array('Move nested children to parent 0',
+				'phpbb_gallery_albums', 0, 4, 0, true, array(
+				array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
+				array('album_id' => 2, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
+				array('album_id' => 3, 'parent_id' => 1, 'user_id' => 0, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
+
+				array('album_id' => 4, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 7, 'right_id' => 8, 'album_parents' => ''),
+
+				array('album_id' => 7, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 9, 'right_id' => 18, 'album_parents' => ''),
+				array('album_id' => 8, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 10, 'right_id' => 11, 'album_parents' => ''),
+				array('album_id' => 9, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 12, 'right_id' => 15, 'album_parents' => ''),
+				array('album_id' => 10, 'parent_id' => 9, 'user_id' => 0, 'left_id' => 13, 'right_id' => 14, 'album_parents' => ''),
+				array('album_id' => 11, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 16, 'right_id' => 17, 'album_parents' => ''),
+
+				array('album_id' => 12, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 19, 'right_id' => 20, 'album_parents' => ''),
+				array('album_id' => 13, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 21, 'right_id' => 22, 'album_parents' => ''),
+				array('album_id' => 5, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 23, 'right_id' => 26, 'album_parents' => ''),
+				array('album_id' => 6, 'parent_id' => 5, 'user_id' => 0, 'left_id' => 24, 'right_id' => 25, 'album_parents' => ''),
+
+				array('album_id' => 14, 'parent_id' => 0, 'user_id' => 2, 'left_id' => 1, 'right_id' => 2, 'album_parents' => ''),
+
+				array('album_id' => 15, 'parent_id' => 0, 'user_id' => 3, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
+				array('album_id' => 16, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
+				array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
+			)),
+		);
+	}
+
+	/**
+	* @dataProvider move_children_data
+	*/
+	public function test_move_children($explain, $table, $user_id, $album_id, $target_id, $expected_moved, $expected)
+	{
+		global $config;
+
+		$config = new phpbb_config(array('phpbb_gallery_album_lock' => 0));
+		set_config(null, null, null, $config);
+
+		$lock = new phpbb_lock_db('phpbb_gallery_album_lock', $config, $this->db);
+		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $lock, $table, $user_id);
+
+		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
+		$target = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$target_id]);
+
+		$this->assertEquals($expected_moved, $set->move_children($album, $target));
+
+		$result = $this->db->sql_query("SELECT album_id, parent_id, user_id, left_id, right_id, album_parents
+			FROM $table
+			ORDER BY user_id, left_id, album_id ASC");
+		$this->assertEquals($expected, $this->db->sql_fetchrowset($result));
+	}
+
+	public function move_children_throws_data()
+	{
+		return array(
+			array('New parent is child', 'phpbb_gallery_albums', 0, 4, 5),
+			array('New parent is child 2', 'phpbb_gallery_albums', 0, 7, 9),
+			array('New parent does not exist', 'phpbb_gallery_albums', 0, 1, 200),
+		);
+	}
+
+	/**
+	* @dataProvider move_children_throws_data
+	*
+	* @expectedException			phpbb_ext_gallery_core_exception
+	* @expectedExceptionMessage		GALLERY_ALBUM_INVALID_PARENT
+	*/
+	public function test_move_children_throws($explain, $table, $user_id, $album_id, $target_id)
+	{
+		global $config;
+
+		$config = new phpbb_config(array('phpbb_gallery_album_lock' => 0));
+		set_config(null, null, null, $config);
+
+		$lock = new phpbb_lock_db('phpbb_gallery_album_lock', $config, $this->db);
+		$set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $lock, $table, $user_id);
+
+		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
+
+		if (!isset($this->album_data[$target_id]))
+		{
+		}
+		$target = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$target_id]);
+
+		$set->move_children($album, $target);
 	}
 }
