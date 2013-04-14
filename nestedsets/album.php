@@ -17,8 +17,11 @@ if (!defined('IN_PHPBB'))
 
 class phpbb_ext_gallery_core_nestedsets_album extends phpbb_ext_gallery_core_nestedsets_abstract
 {
-	/** @var phpbb_db_driver*/
+	/** @var phpbb_db_driver */
 	protected $db;
+
+	/** @var phpbb_lock_db */
+	protected $lock;
 
 	/** @var String */
 	protected $table_name;
@@ -53,10 +56,44 @@ class phpbb_ext_gallery_core_nestedsets_album extends phpbb_ext_gallery_core_nes
 	*/
 	protected $item_basic_data = array('album_id', 'album_name', 'album_type');
 
-	public function __construct(phpbb_db_driver $db, $table_name, $user_id)
+	/**
+	* Construct
+	*
+	* @param phpbb_db_driver	$db		Database connection
+	* @param phpbb_lock_db		$lock	Lock class used to lock the table when moving albums around
+	* @param string				$table_name		Table name
+	* @param int				$user_id	User id used to get the tree
+	*/
+	public function __construct(phpbb_db_driver $db, phpbb_lock_db $lock, $table_name, $user_id)
 	{
 		$this->db = $db;
+		$this->lock = $lock;
 		$this->table_name = $table_name;
 		$this->sql_where = '%1$s' . 'user_id = ' . (int) $user_id;
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function move_children(phpbb_ext_gallery_core_nestedsets_item_interface $current_parent, phpbb_ext_gallery_core_nestedsets_item_interface $new_parent)
+	{
+		while (!$this->lock->acquire())
+		{
+			// Retry after 0.2 seconds
+			usleep(200 * 1000);
+		}
+
+		try
+		{
+			$return = parent::move_children($current_parent, $new_parent);
+		}
+		catch (phpbb_ext_gallery_core_nestedsets_exception $e)
+		{
+			$this->lock->release();
+			throw new phpbb_ext_gallery_core_exception('GALLERY_ALBUM_' . $e->getMessage());
+		}
+		$this->lock->release();
+
+		return $return;
 	}
 }
