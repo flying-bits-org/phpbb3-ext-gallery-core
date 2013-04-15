@@ -241,7 +241,7 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	*/
 	public function move_children(phpbb_ext_gallery_core_nestedsets_item_interface $current_parent, phpbb_ext_gallery_core_nestedsets_item_interface $new_parent)
 	{
-		if (!$current_parent->has_children())
+		if (!$current_parent->has_children() || !$current_parent->get_item_id())
 		{
 			return false;
 		}
@@ -349,6 +349,95 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	*/
 	public function set_parent(phpbb_ext_gallery_core_nestedsets_item_interface $item, phpbb_ext_gallery_core_nestedsets_item_interface $new_parent)
 	{
+		$move_items = array_keys($this->get_branch_data($item, 'children'));
+
+		if (in_array($new_parent->get_item_id(), $move_items))
+		{
+			throw new phpbb_ext_gallery_core_nestedsets_exception('INVALID_PARENT');
+		}
+
+		$sql_exclude_moved_items = $this->db->sql_in_set($this->table_columns['item_id'], $move_items, true);
+
+		$diff = sizeof($move_items) * 2;
+
+		$sql_is_parent = $this->table_columns['left_id'] . ' < ' . $item->get_right_id() . '
+			AND ' . $this->table_columns['right_id'] . ' > ' . $item->get_right_id();
+
+		$sql_is_right = $this->table_columns['left_id'] . ' > ' . $item->get_right_id();
+
+		$this->db->sql_transaction('begin');
+
+		$sql = 'UPDATE ' . $this->table_name . '
+			SET ' . $this->table_columns['left_id'] . ' = ' . $this->db->sql_case($sql_is_right, $this->table_columns['left_id'] . ' - ' . $diff, $this->table_columns['left_id']) . ',
+				' . $this->table_columns['right_id'] . ' = ' . $this->db->sql_case($sql_is_parent . ' OR ' . $sql_is_right, $this->table_columns['right_id'] . ' - ' . $diff, $this->table_columns['right_id']) . ',
+				' . $this->table_columns['item_parents'] . " = ''
+			WHERE " . $sql_exclude_moved_items . '
+					' . $this->get_sql_where('AND');
+		$this->db->sql_query($sql);
+
+		if ($new_parent->get_item_id())
+		{
+			// Retrieve new-parent again, it may have been changed...
+			$sql = 'SELECT *
+				FROM ' . $this->table_name . '
+				WHERE ' . $this->table_columns['item_id'] . ' = ' . $new_parent->get_item_id();
+			$result = $this->db->sql_query($sql);
+			$parent_data = $this->db->sql_fetchrow($result);
+			$this->db->sql_freeresult($result);
+
+			if (!$parent_data)
+			{
+				$this->db->sql_transaction('rollback');
+				throw new phpbb_ext_gallery_core_nestedsets_exception('INVALID_PARENT');
+			}
+
+			$new_parent = new $this->item_class($parent_data);
+
+			$sql = 'UPDATE ' . $this->table_name . '
+				SET ' . $this->table_columns['left_id'] . ' = ' . $this->db->sql_case($this->table_columns['left_id'] . ' > ' . $new_parent->get_right_id(), $this->table_columns['left_id'] . ' + ' . $diff, $this->table_columns['left_id']) . ',
+					' . $this->table_columns['right_id'] . ' = ' . $this->db->sql_case($this->table_columns['right_id'] . ' >= ' . $new_parent->get_right_id(), $this->table_columns['right_id'] . ' + ' . $diff, $this->table_columns['right_id']) . ',
+					' . $this->table_columns['item_parents'] . " = ''
+				WHERE " . $sql_exclude_moved_items . '
+					' . $this->get_sql_where('AND');
+			$this->db->sql_query($sql);
+
+			// Resync moved branch
+			$new_right_id = $new_parent->get_right_id() + $diff;
+
+			if ($new_right_id > $item->get_right_id())
+			{
+				$diff = ' + ' . ($new_right_id - $item->get_right_id() - 1);
+			}
+			else
+			{
+				$diff = ' - ' . abs($new_right_id - $item->get_right_id() - 1);
+			}
+		}
+		else
+		{
+			$sql = 'SELECT MAX(' . $this->table_columns['right_id'] . ') AS ' . $this->table_columns['right_id'] . '
+				FROM ' . $this->table_name . '
+				WHERE ' . $sql_exclude_moved_items . '
+					' . $this->get_sql_where('AND');
+			$result = $this->db->sql_query($sql);
+			$row = $this->db->sql_fetchrow($result);
+			$this->db->sql_freeresult($result);
+
+			$diff = ' + ' . ($row[$this->table_columns['right_id']] - $item->get_left_id() + 1);
+		}
+
+		$sql = 'UPDATE ' . $this->table_name . '
+			SET ' . $this->table_columns['left_id'] . ' = ' . $this->table_columns['left_id'] . $diff . ',
+				' . $this->table_columns['right_id'] . ' = ' . $this->table_columns['right_id'] . $diff . ',
+				' . $this->table_columns['parent_id'] . ' = ' . $this->db->sql_case($this->table_columns['item_id'] . ' = ' . $item->get_item_id(), $new_parent->get_item_id(), $this->table_columns['parent_id']) . ',
+				' . $this->table_columns['item_parents'] . " = ''
+			WHERE " . $this->db->sql_in_set($this->table_columns['item_id'], $move_items) . '
+				' . $this->get_sql_where('AND');
+		$this->db->sql_query($sql);
+
+		$this->db->sql_transaction('commit');
+
+		return true;
 	}
 
 	/**

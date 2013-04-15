@@ -96,4 +96,29 @@ class phpbb_ext_gallery_core_nestedsets_album extends phpbb_ext_gallery_core_nes
 
 		return $return;
 	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function set_parent(phpbb_ext_gallery_core_nestedsets_item_interface $item, phpbb_ext_gallery_core_nestedsets_item_interface $new_parent)
+	{
+		while (!$this->lock->acquire())
+		{
+			// Retry after 0.2 seconds
+			usleep(200 * 1000);
+		}
+
+		try
+		{
+			$return = parent::set_parent($item, $new_parent);
+		}
+		catch (phpbb_ext_gallery_core_nestedsets_exception $e)
+		{
+			$this->lock->release();
+			throw new phpbb_ext_gallery_core_exception('GALLERY_ALBUM_' . $e->getMessage());
+		}
+		$this->lock->release();
+
+		return $return;
+	}
 }
