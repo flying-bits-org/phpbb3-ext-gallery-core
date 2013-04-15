@@ -7,6 +7,8 @@
 *
 */
 
+require_once dirname(__FILE__) . '/set_album_base.php';
+
 class phpbb_ext_gallery_tests_nestedsets_set_album_remove_test extends phpbb_ext_gallery_tests_nestedsets_set_album_base
 {
 	public function remove_data()
