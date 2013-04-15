@@ -61,7 +61,7 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	* @param string		$column_prefix	Prefix that needs to be prepended to column names
 	* @return bool True if the item was deleted
 	*/
-	protected function get_sql_where($operator = 'AND', $column_prefix = '')
+	public function get_sql_where($operator = 'AND', $column_prefix = '')
 	{
 		return !$this->sql_where ?: $operator . ' ' . sprintf($this->sql_where, $column_prefix);
 	}
