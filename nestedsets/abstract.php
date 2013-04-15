@@ -241,7 +241,7 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	*/
 	public function move_children(phpbb_ext_gallery_core_nestedsets_item_interface $current_parent, phpbb_ext_gallery_core_nestedsets_item_interface $new_parent)
 	{
-		if (!$current_parent->has_children() || !$current_parent->get_item_id())
+		if (!$current_parent->has_children() || !$current_parent->get_item_id() || $current_parent->get_item_id() == $new_parent->get_item_id())
 		{
 			return false;
 		}
