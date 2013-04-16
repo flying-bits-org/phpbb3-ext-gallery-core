@@ -264,16 +264,7 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 
 			$new_parent = new $this->item_class($parent_data);
 
-			$sql = 'UPDATE ' . $this->table_name . '
-				SET ' . $this->table_columns['left_id'] . ' = ' . $this->db->sql_case($this->table_columns['left_id'] . ' > ' . $new_parent->get_right_id(), $this->table_columns['left_id'] . ' + ' . $diff, $this->table_columns['left_id']) . ',
-					' . $this->table_columns['right_id'] . ' = ' . $this->db->sql_case($this->table_columns['right_id'] . ' >= ' . $new_parent->get_right_id(), $this->table_columns['right_id'] . ' + ' . $diff, $this->table_columns['right_id']) . ',
-					' . $this->table_columns['item_parents'] . " = ''
-				WHERE " . $sql_exclude_moved_items . '
-					' . $this->get_sql_where('AND');
-			$this->db->sql_query($sql);
-
-			// Resync moved branch
-			$new_right_id = $new_parent->get_right_id() + $diff;
+			$new_right_id = $this->prepare_adding_subset($move_items, $new_parent);
 
 			if ($new_right_id > $current_parent->get_right_id())
 			{
@@ -355,16 +346,7 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 
 			$new_parent = new $this->item_class($parent_data);
 
-			$sql = 'UPDATE ' . $this->table_name . '
-				SET ' . $this->table_columns['left_id'] . ' = ' . $this->db->sql_case($this->table_columns['left_id'] . ' > ' . $new_parent->get_right_id(), $this->table_columns['left_id'] . ' + ' . $diff, $this->table_columns['left_id']) . ',
-					' . $this->table_columns['right_id'] . ' = ' . $this->db->sql_case($this->table_columns['right_id'] . ' >= ' . $new_parent->get_right_id(), $this->table_columns['right_id'] . ' + ' . $diff, $this->table_columns['right_id']) . ',
-					' . $this->table_columns['item_parents'] . " = ''
-				WHERE " . $sql_exclude_moved_items . '
-					' . $this->get_sql_where('AND');
-			$this->db->sql_query($sql);
-
-			// Resync moved branch
-			$new_right_id = $new_parent->get_right_id() + $diff;
+			$new_right_id = $this->prepare_adding_subset($move_items, $new_parent);
 
 			if ($new_right_id > $item->get_right_id())
 			{
@@ -498,6 +480,7 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	* @param array	$subset_items		Subset of items to remove
 	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$bounding_item	Item containing the right bound of the subset
 	* @param bool	$set_subset_zero	Should the parent, left and right id of the item be set to 0, or kept unchanged?
+	* @return	null
 	*/
 	protected function remove_subset(array $subset_items, phpbb_ext_gallery_core_nestedsets_item_interface $bounding_item, $set_subset_zero = true)
 	{
@@ -526,5 +509,31 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 				' . $this->table_columns['item_parents'] . " = ''
 			" . ((!$set_subset_zero) ? ' WHERE ' . $sql_not_subset_items . ' ' . $this->get_sql_where('AND') : $this->get_sql_where('WHERE'));
 		$this->db->sql_query($sql);
+	}
+
+	/**
+	* Add a subset to the nested set
+	*
+	* @param array	$subset_items		Subset of items to add
+	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$new_parent	Item containing the right bound of the new parent
+	* @return	int		New right id of the parent item
+	*/
+	protected function prepare_adding_subset(array $subset_items, phpbb_ext_gallery_core_nestedsets_item_interface $new_parent)
+	{
+		$diff = sizeof($subset_items) * 2;
+		$sql_not_subset_items = $this->db->sql_in_set($this->table_columns['item_id'], $subset_items, true);
+
+		$set_left_id = $this->db->sql_case($this->table_columns['left_id'] . ' > ' . $new_parent->get_right_id(), $this->table_columns['left_id'] . ' + ' . $diff, $this->table_columns['left_id']);
+		$set_right_id = $this->db->sql_case($this->table_columns['right_id'] . ' >= ' . $new_parent->get_right_id(), $this->table_columns['right_id'] . ' + ' . $diff, $this->table_columns['right_id']);
+
+		$sql = 'UPDATE ' . $this->table_name . '
+			SET ' . $this->table_columns['left_id'] . ' = ' . $set_left_id . ',
+				' . $this->table_columns['right_id'] . ' = ' . $set_right_id . ',
+				' . $this->table_columns['item_parents'] . " = ''
+			WHERE " . $sql_not_subset_items . '
+				' . $this->get_sql_where('AND');
+		$this->db->sql_query($sql);
+
+		return $new_parent->get_right_id() + $diff;
 	}
 }
