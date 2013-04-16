@@ -18,29 +18,12 @@ if (!defined('IN_PHPBB'))
 interface phpbb_ext_gallery_core_nestedsets_interface
 {
 	/**
-	* Move an item by a given delta
+	* Insert an item into the nested set (also insert the rows into the table)
 	*
-	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item	The item to be moved
-	* @param int	$delta	Number of steps to move this item, < 0 => down, > 0 => up
-	* @return bool True if the item was moved
+	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item	The item to be added
+	* @return array Array with item data as set in the database
 	*/
-	public function move(phpbb_ext_gallery_core_nestedsets_item_interface $item, $delta);
-
-	/**
-	* Move an item down by 1
-	*
-	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item	The item to be moved
-	* @return bool True if the item was moved
-	*/
-	public function move_down(phpbb_ext_gallery_core_nestedsets_item_interface $item);
-
-	/**
-	* Move an item up by 1
-	*
-	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item	The item to be moved
-	* @return bool True if the item was moved
-	*/
-	public function move_up(phpbb_ext_gallery_core_nestedsets_item_interface $item);
+	public function insert(array $additional_data);
 
 	/**
 	* Add an item at the end of the nested set
@@ -71,6 +54,31 @@ interface phpbb_ext_gallery_core_nestedsets_interface
 	public function delete(phpbb_ext_gallery_core_nestedsets_item_interface $item);
 
 	/**
+	* Move an item by a given delta
+	*
+	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item	The item to be moved
+	* @param int	$delta	Number of steps to move this item, < 0 => down, > 0 => up
+	* @return bool True if the item was moved
+	*/
+	public function move(phpbb_ext_gallery_core_nestedsets_item_interface $item, $delta);
+
+	/**
+	* Move an item down by 1
+	*
+	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item	The item to be moved
+	* @return bool True if the item was moved
+	*/
+	public function move_down(phpbb_ext_gallery_core_nestedsets_item_interface $item);
+
+	/**
+	* Move an item up by 1
+	*
+	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item	The item to be moved
+	* @return bool True if the item was moved
+	*/
+	public function move_up(phpbb_ext_gallery_core_nestedsets_item_interface $item);
+
+	/**
 	* Moves all children of one item to another item
 	*
 	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$current_parent		The current parent item
@@ -78,15 +86,6 @@ interface phpbb_ext_gallery_core_nestedsets_interface
 	* @return bool True if any items where moved
 	*/
 	public function move_children(phpbb_ext_gallery_core_nestedsets_item_interface $current_parent, phpbb_ext_gallery_core_nestedsets_item_interface $new_parent);
-
-	/**
-	* Add an item as child of a given parent
-	*
-	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$new_parent		The parent item
-	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$item			The item to be added
-	* @return bool True if the item was added
-	*/
-	public function add_child(phpbb_ext_gallery_core_nestedsets_item_interface $new_parent, phpbb_ext_gallery_core_nestedsets_item_interface $item);
 
 	/**
 	* Set the parent item

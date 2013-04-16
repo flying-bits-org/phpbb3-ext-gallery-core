@@ -69,6 +69,91 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	/**
 	* @inheritdoc
 	*/
+	public function insert(array $additional_data)
+	{
+		$item_data = array_merge($additional_data, array(
+			$this->table_columns['parent_id']		=> 0,
+			$this->table_columns['left_id']			=> 0,
+			$this->table_columns['right_id']		=> 0,
+			$this->table_columns['item_parents']	=> '',
+		));
+
+		unset($item_data[$this->table_columns['item_id']]);
+
+		$sql = 'INSERT INTO ' . $this->table_name . ' ' . $this->db->sql_build_array('INSERT', $item_data);
+		$this->db->sql_query($sql);
+
+		$item_data[$this->table_columns['item_id']] = (int) $this->db->sql_nextid();
+
+		$item = new $this->item_class($item_data);
+
+		return array_merge($item_data, $this->add($item));
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function add(phpbb_ext_gallery_core_nestedsets_item_interface $item)
+	{
+		$sql = 'SELECT MAX(' . $this->table_columns['right_id'] . ') AS ' . $this->table_columns['right_id'] . '
+			FROM ' . $this->table_name . '
+			' . $this->get_sql_where('WHERE');
+		$result = $this->db->sql_query($sql);
+		$current_max_right_id = (int) $this->db->sql_fetchfield($this->table_columns['right_id']);
+		$this->db->sql_freeresult($result);
+
+		$update_item_data = array(
+			$this->table_columns['parent_id']		=> 0,
+			$this->table_columns['left_id']			=> $current_max_right_id + 1,
+			$this->table_columns['right_id']		=> $current_max_right_id + 2,
+			$this->table_columns['item_parents']	=> '',
+		);
+
+		$sql = 'UPDATE ' . $this->table_name . '
+			SET ' . $this->db->sql_build_array('UPDATE', $update_item_data) . '
+			WHERE ' . $this->table_columns['item_id'] . ' = ' . $item->get_item_id();
+		$this->db->sql_query($sql);
+
+		return $update_item_data;
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function remove(phpbb_ext_gallery_core_nestedsets_item_interface $item)
+	{
+		if ($item->has_children())
+		{
+			$items = array_keys($this->get_branch_data($item, 'children'));
+		}
+		else
+		{
+			$items = array($item->get_item_id());
+		}
+
+		$this->remove_subset($items, $item);
+
+		return $items;
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function delete(phpbb_ext_gallery_core_nestedsets_item_interface $item)
+	{
+		$removed_items = $this->remove($item);
+
+		$sql = 'DELETE FROM ' . $this->table_name . '
+			WHERE ' . $this->db->sql_in_set($this->table_columns['item_id'], $removed_items) . '
+			' . $this->get_sql_where('AND');
+		$this->db->sql_query($sql);
+
+		return $removed_items;
+	}
+
+	/**
+	* @inheritdoc
+	*/
 	public function move(phpbb_ext_gallery_core_nestedsets_item_interface $item, $delta)
 	{
 		if ($delta == 0)
@@ -184,47 +269,6 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 	/**
 	* @inheritdoc
 	*/
-	public function add(phpbb_ext_gallery_core_nestedsets_item_interface $item)
-	{
-	}
-
-	/**
-	* @inheritdoc
-	*/
-	public function remove(phpbb_ext_gallery_core_nestedsets_item_interface $item)
-	{
-		if ($item->has_children())
-		{
-			$items = array_keys($this->get_branch_data($item, 'children'));
-		}
-		else
-		{
-			$items = array($item->get_item_id());
-		}
-
-		$this->remove_subset($items, $item);
-
-		return $items;
-	}
-
-	/**
-	* @inheritdoc
-	*/
-	public function delete(phpbb_ext_gallery_core_nestedsets_item_interface $item)
-	{
-		$removed_items = $this->remove($item);
-
-		$sql = 'DELETE FROM ' . $this->table_name . '
-			WHERE ' . $this->db->sql_in_set($this->table_columns['item_id'], $removed_items) . '
-			' . $this->get_sql_where('AND');
-		$this->db->sql_query($sql);
-
-		return $removed_items;
-	}
-
-	/**
-	* @inheritdoc
-	*/
 	public function move_children(phpbb_ext_gallery_core_nestedsets_item_interface $current_parent, phpbb_ext_gallery_core_nestedsets_item_interface $new_parent)
 	{
 		if (!$current_parent->has_children() || !$current_parent->get_item_id() || $current_parent->get_item_id() == $new_parent->get_item_id())
@@ -300,13 +344,6 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 		$this->db->sql_transaction('commit');
 
 		return true;
-	}
-
-	/**
-	* @inheritdoc
-	*/
-	public function add_child(phpbb_ext_gallery_core_nestedsets_item_interface $new_parent, phpbb_ext_gallery_core_nestedsets_item_interface $item)
-	{
 	}
 
 	/**
