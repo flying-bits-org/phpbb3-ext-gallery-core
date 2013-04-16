@@ -51,6 +51,12 @@ class phpbb_ext_gallery_core_nestedsets_album extends phpbb_ext_gallery_core_nes
 	protected $sql_where = '';
 
 	/**
+	* Album set owner user_id
+	* @var int
+	*/
+	protected $user_id;
+
+	/**
 	* List of item properties to be cached in $item_parents
 	* @var array
 	*/
@@ -69,7 +75,20 @@ class phpbb_ext_gallery_core_nestedsets_album extends phpbb_ext_gallery_core_nes
 		$this->db = $db;
 		$this->lock = $lock;
 		$this->table_name = $table_name;
-		$this->sql_where = '%1$s' . 'user_id = ' . (int) $user_id;
+		$this->user_id = (int) $user_id;
+		$this->sql_where = '%1$s' . 'user_id = ' . $this->user_id;
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function insert(array $additional_data)
+	{
+		$item_data = array_merge($additional_data, array(
+			'user_id'	=> $this->user_id,
+		));
+
+		return parent::insert($item_data);
 	}
 
 	/**
