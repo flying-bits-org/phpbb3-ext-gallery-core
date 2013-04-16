@@ -573,4 +573,62 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 
 		return $new_parent->get_right_id() + $diff;
 	}
+
+	/**
+	* @inheritdoc
+	*
+	* @author EXreaction
+	*/
+	public function recalculate_nested_set($new_id, $parent_id = 0, $reset_ids = false)
+	{
+		if ($reset_ids)
+		{
+			$sql = 'UPDATE ' . $this->table_name . '
+				SET ' . $this->db->sql_build_array('UPDATE', array(
+					$this->table_columns['left_id'] => 0,
+					$this->table_columns['right_id'] => 0,
+					$this->table_columns['item_parents'] => '',
+				)) . '
+				' . $this->get_sql_where('WHERE');
+			$this->db->sql_query($sql);
+		}
+
+		$sql = 'SELECT *
+			FROM ' . $this->table_name . '
+			WHERE ' . $this->table_columns['parent_id'] . ' = ' . (int) $parent_id . '
+				' . $this->get_sql_where('AND') . '
+			ORDER BY ' . $this->table_columns['left_id'] . ', ' . $this->table_columns['item_id'] . ' ASC';
+		$result = $this->db->sql_query($sql);
+		while ($row = $this->db->sql_fetchrow($result))
+		{
+			// First we update the left_id for this module
+			if ($row[$this->table_columns['left_id']] != $new_id)
+			{
+				$sql = 'UPDATE ' . $this->table_name . '
+					SET ' . $this->db->sql_build_array('UPDATE', array(
+						$this->table_columns['left_id'] => $new_id,
+						$this->table_columns['item_parents'] => '',
+					)) . '
+					WHERE ' . $this->table_columns['item_id'] . ' = ' . $row[$this->table_columns['item_id']];
+				$this->db->sql_query($sql);
+			}
+			$new_id++;
+
+			// Then we go through any children and update their left/right id's
+			$new_id = $this->recalculate_nested_set($new_id, $row[$this->table_columns['item_id']]);
+
+			// Then we come back and update the right_id for this module
+			if ($row[$this->table_columns['right_id']] != $new_id)
+			{
+				$sql = 'UPDATE ' . $this->table_name . '
+					SET ' . $this->db->sql_build_array('UPDATE', array($this->table_columns['right_id'] => $new_id)) . '
+					WHERE ' . $this->table_columns['item_id'] . ' = ' . $row[$this->table_columns['item_id']];
+				$this->db->sql_query($sql);
+			}
+			$new_id++;
+		}
+		$this->db->sql_freeresult($result);
+
+		return $new_id;
+	}
 }

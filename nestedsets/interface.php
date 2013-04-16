@@ -118,4 +118,14 @@ interface phpbb_ext_gallery_core_nestedsets_interface
 	*							ID => Item data
 	*/
 	public function get_parent_data(phpbb_ext_gallery_core_nestedsets_item_interface $item);
+
+	/**
+	* Recalculate Nested Sets
+	*
+	* @param int	$new_id		First left_id to be used (should start with 1)
+	* @param int	$parent_id	parent_id of the current set (default = 0)
+	* @param bool	$reset_ids	Should we reset all left_id/right_id on the first call?
+	* @return	int		$new_id		The next left_id/right_id that should be used
+	*/
+	public function recalculate_nested_set($new_id, $parent_id = 0, $reset_ids = false);
 }
