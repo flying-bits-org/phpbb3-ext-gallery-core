@@ -196,27 +196,13 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 		if ($item->has_children())
 		{
 			$items = array_keys($this->get_branch_data($item, 'children'));
-			$diff = sizeof($items) * 2;
 		}
 		else
 		{
 			$items = array($item->get_item_id());
-			$diff = 2;
 		}
 
-		$sql_is_parent = $this->table_columns['left_id'] . ' < ' . $item->get_right_id() . '
-			AND ' . $this->table_columns['right_id'] . ' > ' . $item->get_right_id();
-
-		$sql_is_right = $this->table_columns['left_id'] . ' > ' . $item->get_right_id();
-		$sql_remove_items = $this->db->sql_in_set($this->table_columns['item_id'], $items);
-
-		$sql = 'UPDATE ' . $this->table_name . '
-			SET ' . $this->table_columns['left_id'] . ' = ' . $this->db->sql_case($sql_is_right, $this->table_columns['left_id'] . ' - ' . $diff, $this->db->sql_case($sql_remove_items, 0, $this->table_columns['left_id'])) . ',
-				' . $this->table_columns['right_id'] . ' = ' . $this->db->sql_case($sql_is_parent . ' OR ' . $sql_is_right, $this->table_columns['right_id'] . ' - ' . $diff, $this->db->sql_case($sql_remove_items, 0, $this->table_columns['right_id'])) . ',
-				' . $this->table_columns['parent_id'] . ' = ' . $this->db->sql_case($sql_remove_items, 0, $this->table_columns['parent_id']) . ',
-				' . $this->table_columns['item_parents'] . " = ''
-			" . $this->get_sql_where('WHERE');
-		$this->db->sql_query($sql);
+		$this->remove_subset($items, $item);
 
 		return $items;
 	}
@@ -253,24 +239,12 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 			throw new phpbb_ext_gallery_core_nestedsets_exception('INVALID_PARENT');
 		}
 
-		$sql_exclude_moved_items = $this->db->sql_in_set($this->table_columns['item_id'], $move_items, true);
-
 		$diff = sizeof($move_items) * 2;
-
-		$sql_is_parent = $this->table_columns['left_id'] . ' <= ' . $current_parent->get_right_id() . '
-			AND ' . $this->table_columns['right_id'] . ' >= ' . $current_parent->get_right_id();
-
-		$sql_is_right = $this->table_columns['left_id'] . ' > ' . $current_parent->get_right_id();
+		$sql_exclude_moved_items = $this->db->sql_in_set($this->table_columns['item_id'], $move_items, true);
 
 		$this->db->sql_transaction('begin');
 
-		$sql = 'UPDATE ' . $this->table_name . '
-			SET ' . $this->table_columns['left_id'] . ' = ' . $this->db->sql_case($sql_is_right, $this->table_columns['left_id'] . ' - ' . $diff, $this->table_columns['left_id']) . ',
-				' . $this->table_columns['right_id'] . ' = ' . $this->db->sql_case($sql_is_parent . ' OR ' . $sql_is_right, $this->table_columns['right_id'] . ' - ' . $diff, $this->table_columns['right_id']) . ',
-				' . $this->table_columns['item_parents'] . " = ''
-			WHERE " . $sql_exclude_moved_items . '
-					' . $this->get_sql_where('AND');
-		$this->db->sql_query($sql);
+		$this->remove_subset($move_items, $current_parent, false);
 
 		if ($new_parent->get_item_id())
 		{
@@ -356,24 +330,12 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 			throw new phpbb_ext_gallery_core_nestedsets_exception('INVALID_PARENT');
 		}
 
-		$sql_exclude_moved_items = $this->db->sql_in_set($this->table_columns['item_id'], $move_items, true);
-
 		$diff = sizeof($move_items) * 2;
-
-		$sql_is_parent = $this->table_columns['left_id'] . ' < ' . $item->get_right_id() . '
-			AND ' . $this->table_columns['right_id'] . ' > ' . $item->get_right_id();
-
-		$sql_is_right = $this->table_columns['left_id'] . ' > ' . $item->get_right_id();
+		$sql_exclude_moved_items = $this->db->sql_in_set($this->table_columns['item_id'], $move_items, true);
 
 		$this->db->sql_transaction('begin');
 
-		$sql = 'UPDATE ' . $this->table_name . '
-			SET ' . $this->table_columns['left_id'] . ' = ' . $this->db->sql_case($sql_is_right, $this->table_columns['left_id'] . ' - ' . $diff, $this->table_columns['left_id']) . ',
-				' . $this->table_columns['right_id'] . ' = ' . $this->db->sql_case($sql_is_parent . ' OR ' . $sql_is_right, $this->table_columns['right_id'] . ' - ' . $diff, $this->table_columns['right_id']) . ',
-				' . $this->table_columns['item_parents'] . " = ''
-			WHERE " . $sql_exclude_moved_items . '
-					' . $this->get_sql_where('AND');
-		$this->db->sql_query($sql);
+		$this->remove_subset($move_items, $item, false);
 
 		if ($new_parent->get_item_id())
 		{
@@ -528,5 +490,41 @@ abstract class phpbb_ext_gallery_core_nestedsets_abstract implements phpbb_ext_g
 		}
 
 		return $parents;
+	}
+
+	/**
+	* Remove a subset from the nested set
+	*
+	* @param array	$subset_items		Subset of items to remove
+	* @param phpbb_ext_gallery_core_nestedsets_item_interface	$bounding_item	Item containing the right bound of the subset
+	* @param bool	$set_subset_zero	Should the parent, left and right id of the item be set to 0, or kept unchanged?
+	*/
+	protected function remove_subset(array $subset_items, phpbb_ext_gallery_core_nestedsets_item_interface $bounding_item, $set_subset_zero = true)
+	{
+		$diff = sizeof($subset_items) * 2;
+		$sql_subset_items = $this->db->sql_in_set($this->table_columns['item_id'], $subset_items);
+		$sql_not_subset_items = $this->db->sql_in_set($this->table_columns['item_id'], $subset_items, true);
+
+		$sql_is_parent = $this->table_columns['left_id'] . ' <= ' . $bounding_item->get_right_id() . '
+			AND ' . $this->table_columns['right_id'] . ' >= ' . $bounding_item->get_right_id();
+
+		$sql_is_right = $this->table_columns['left_id'] . ' > ' . $bounding_item->get_right_id();
+
+		$set_left_id = $this->db->sql_case($sql_is_right, $this->table_columns['left_id'] . ' - ' . $diff, $this->table_columns['left_id']);
+		$set_right_id = $this->db->sql_case($sql_is_parent . ' OR ' . $sql_is_right, $this->table_columns['right_id'] . ' - ' . $diff, $this->table_columns['right_id']);
+
+		if ($set_subset_zero)
+		{
+			$set_left_id = $this->db->sql_case($sql_subset_items, 0, $set_left_id);
+			$set_right_id = $this->db->sql_case($sql_subset_items, 0, $set_right_id);
+		}
+
+		$sql = 'UPDATE ' . $this->table_name . '
+			SET ' . $this->table_columns['left_id'] . ' = ' . $set_left_id . ',
+				' . $this->table_columns['right_id'] . ' = ' . $set_right_id . ',
+				' . (($set_subset_zero) ? $this->table_columns['parent_id'] . ' = ' . $this->db->sql_case($sql_subset_items, 0, $this->table_columns['parent_id']) . ',' : '') . '
+				' . $this->table_columns['item_parents'] . " = ''
+			" . ((!$set_subset_zero) ? ' WHERE ' . $sql_not_subset_items . ' ' . $this->get_sql_where('AND') : $this->get_sql_where('WHERE'));
+		$this->db->sql_query($sql);
 	}
 }
