@@ -15,7 +15,7 @@ if (!defined('IN_PHPBB'))
 	exit;
 }
 
-class phpbb_ext_gallery_core_nestedsets_album extends phpbb_ext_gallery_core_nestedsets_abstract
+class phpbb_ext_gallery_core_album_nestedset extends phpbb_ext_gallery_core_nestedsets_abstract
 {
 	/** @var phpbb_db_driver */
 	protected $db;
@@ -27,12 +27,14 @@ class phpbb_ext_gallery_core_nestedsets_album extends phpbb_ext_gallery_core_nes
 	protected $table_name;
 
 	/** @var String */
-	protected $item_class = 'phpbb_ext_gallery_core_nestedsets_item_album';
+	protected $item_class = 'phpbb_ext_gallery_core_album_nestedsetitem';
 
 	/**
 	* Column names in the table
 	* @var array
 	*/
+	protected $column_item_id = 'album_id';
+	protected $column_item_parents = 'album_parents';
 	protected $table_columns = array(
 		'item_id'	=> 'album_id',
 		'left_id'	=> 'left_id',
@@ -68,13 +70,23 @@ class phpbb_ext_gallery_core_nestedsets_album extends phpbb_ext_gallery_core_nes
 	* @param phpbb_db_driver	$db		Database connection
 	* @param phpbb_lock_db		$lock	Lock class used to lock the table when moving albums around
 	* @param string				$table_name		Table name
-	* @param int				$user_id	User id used to get the tree
 	*/
-	public function __construct(phpbb_db_driver $db, phpbb_lock_db $lock, $table_name, $user_id)
+	public function __construct(phpbb_db_driver $db, phpbb_lock_db $lock, $table_name)
 	{
 		$this->db = $db;
 		$this->lock = $lock;
 		$this->table_name = $table_name;
+		$this->user_id = 0;
+		$this->sql_where = '%1$s' . 'user_id = 0';
+	}
+
+	/**
+	* Set user id to select a specific album tree
+	*
+	* @param int				$user_id	User id used to get the tree
+	*/
+	public function set_user_id($user_id)
+	{
 		$this->user_id = (int) $user_id;
 		$this->sql_where = '%1$s' . 'user_id = ' . $this->user_id;
 	}

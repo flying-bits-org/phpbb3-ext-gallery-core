@@ -10,6 +10,13 @@ services:
             - @gallery.album.type_collection
             - %tables.gallery.albums%
 
+    gallery.album.nestedset:
+        class: phpbb_ext_gallery_core_nestedsets_album
+        arguments:
+            - @dbal.conn
+            - @gallery.album.lock
+            - %tables.gallery.albums%
+
     gallery.album.lock:
         class: phpbb_ext_gallery_core_album_factory
         arguments:

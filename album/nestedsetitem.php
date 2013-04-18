@@ -15,7 +15,7 @@ if (!defined('IN_PHPBB'))
 	exit;
 }
 
-class phpbb_ext_gallery_core_nestedsets_item_album extends phpbb_ext_gallery_core_nestedsets_item_abstract
+class phpbb_ext_gallery_core_album_nestedsetitem extends phpbb_ext_gallery_core_nestedsets_item_abstract
 {
 	/** @var int */
 	protected $user_id;
