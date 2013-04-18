@@ -20,7 +20,7 @@ class phpbb_ext_gallery_tests_nestedsets_item_album_test extends phpbb_ext_galle
 			'album_parents'	=> '',
 		);
 
-		$album = new phpbb_ext_gallery_core_nestedsets_item_album($album_data);
+		$album = new phpbb_ext_gallery_core_album_nestedsetitem($album_data);
 
 		$this->assertEquals($album->get_item_id(), $album_data['album_id']);
 		$this->assertEquals($album->get_left_id(), $album_data['left_id']);

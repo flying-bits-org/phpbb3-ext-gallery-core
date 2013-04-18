@@ -23,12 +23,18 @@ class phpbb_ext_gallery_tests_album_factory_test extends phpbb_ext_gallery_datab
 		// Container
 		$container = new phpbb_mock_container_builder();
 
+		$config = new phpbb_config(array('phpbb_gallery_album_lock' => 0));
+		set_config(null, null, null, $config);
+		$lock = new phpbb_lock_db('phpbb_gallery_album_lock', $config, $this->db);
+		$nestedset = new phpbb_ext_gallery_core_album_nestedset($this->db, $lock, 'phpbb_gallery_albums');
+		$container->set('gallery.album.nestedset', $nestedset);
+
 		$type_collection = array();
 		$types = array('category');
 		foreach ($types as $type)
 		{
 			$class_name = 'phpbb_ext_gallery_core_album_' . $type;
-			$type_class = new $class_name($this->db, 'phpbb_gallery_albums');
+			$type_class = new $class_name($this->db, $nestedset, 'phpbb_gallery_albums');
 			$type_collection[] = $type_class;
 			$container->set('gallery.album.type.' . $type, $type_class);
 		}

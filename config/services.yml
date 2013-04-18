@@ -33,6 +33,7 @@ services:
 
     gallery.album.type.category:
         class: phpbb_ext_gallery_core_album_category
+        scope: prototype
         arguments:
             - @dbal.conn
             - %tables.gallery.albums%

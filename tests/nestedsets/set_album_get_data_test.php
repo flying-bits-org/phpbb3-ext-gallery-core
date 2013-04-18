@@ -66,7 +66,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_get_data_test extends phpbb_e
 	*/
 	public function test_get_branch_data($album_id, $type, $order_desc, $include_item, $expected)
 	{
-		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
+		$album = new phpbb_ext_gallery_core_album_nestedsetitem($this->album_data[$album_id]);
 
 		$this->assertEquals($expected, array_keys($this->set->get_branch_data($album, $type, $order_desc, $include_item)));
 	}
@@ -89,7 +89,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_get_data_test extends phpbb_e
 	public function test_get_parent_data($album_id, $album_data, $expected)
 	{
 		$data = array_merge($this->album_data[$album_id], $album_data);
-		$album = new phpbb_ext_gallery_core_nestedsets_item_album($data);
+		$album = new phpbb_ext_gallery_core_album_nestedsetitem($data);
 
 		$this->assertEquals($expected, array_keys($this->set->get_parent_data($album)));
 	}

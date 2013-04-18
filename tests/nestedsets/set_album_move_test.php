@@ -169,7 +169,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_move_test extends phpbb_ext_g
 	*/
 	public function test_move($explain, $album_id, $delta, $expected_moved, $expected)
 	{
-		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
+		$album = new phpbb_ext_gallery_core_album_nestedsetitem($this->album_data[$album_id]);
 
 		$this->assertEquals($expected_moved, $this->set->move($album, $delta));
 
@@ -232,7 +232,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_move_test extends phpbb_ext_g
 	*/
 	public function test_move_down($explain, $album_id, $expected_moved, $expected)
 	{
-		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
+		$album = new phpbb_ext_gallery_core_album_nestedsetitem($this->album_data[$album_id]);
 
 		$this->assertEquals($expected_moved, $this->set->move_down($album));
 
@@ -295,7 +295,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_move_test extends phpbb_ext_g
 	*/
 	public function test_move_up($explain, $album_id, $expected_moved, $expected)
 	{
-		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
+		$album = new phpbb_ext_gallery_core_album_nestedsetitem($this->album_data[$album_id]);
 
 		$this->assertEquals($expected_moved, $this->set->move_up($album));
 
@@ -541,8 +541,8 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_move_test extends phpbb_ext_g
 	*/
 	public function test_move_children($explain, $album_id, $target_id, $expected_moved, $expected)
 	{
-		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
-		$target = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$target_id]);
+		$album = new phpbb_ext_gallery_core_album_nestedsetitem($this->album_data[$album_id]);
+		$target = new phpbb_ext_gallery_core_album_nestedsetitem($this->album_data[$target_id]);
 
 		$this->assertEquals($expected_moved, $this->set->move_children($album, $target));
 
@@ -569,8 +569,8 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_move_test extends phpbb_ext_g
 	*/
 	public function test_move_children_throws($explain, $album_id, $target_id)
 	{
-		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
-		$target = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$target_id]);
+		$album = new phpbb_ext_gallery_core_album_nestedsetitem($this->album_data[$album_id]);
+		$target = new phpbb_ext_gallery_core_album_nestedsetitem($this->album_data[$target_id]);
 
 		$this->set->move_children($album, $target);
 	}
@@ -736,8 +736,8 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_move_test extends phpbb_ext_g
 	*/
 	public function test_set_parent($explain, $album_id, $target_id, $expected_moved, $expected)
 	{
-		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
-		$target = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$target_id]);
+		$album = new phpbb_ext_gallery_core_album_nestedsetitem($this->album_data[$album_id]);
+		$target = new phpbb_ext_gallery_core_album_nestedsetitem($this->album_data[$target_id]);
 
 		$this->assertEquals($expected_moved, $this->set->set_parent($album, $target));
 
@@ -764,8 +764,8 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_move_test extends phpbb_ext_g
 	*/
 	public function test_set_parent_throws($explain, $album_id, $target_id)
 	{
-		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
-		$target = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$target_id]);
+		$album = new phpbb_ext_gallery_core_album_nestedsetitem($this->album_data[$album_id]);
+		$target = new phpbb_ext_gallery_core_album_nestedsetitem($this->album_data[$target_id]);
 
 		$this->set->set_parent($album, $target);
 	}

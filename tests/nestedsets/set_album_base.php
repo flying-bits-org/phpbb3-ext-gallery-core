@@ -63,10 +63,11 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_base extends phpbb_ext_galler
 
 		global $config;
 
-		$config = $this->config = new phpbb_config(array('phpbb_gallery_album_lock' => 0));
-		set_config(null, null, null, $this->config);
+		$config = new phpbb_config(array('phpbb_gallery_album_lock' => 0));
+		set_config(null, null, null, $config);
 
-		$this->lock = new phpbb_lock_db('phpbb_gallery_album_lock', $this->config, $this->db);
-		$this->set = new phpbb_ext_gallery_core_nestedsets_album($this->db, $this->lock, 'phpbb_gallery_albums', 0);
+		$this->lock = new phpbb_lock_db('phpbb_gallery_album_lock', $config, $this->db);
+		$this->set = new phpbb_ext_gallery_core_album_nestedset($this->db, $this->lock, 'phpbb_gallery_albums');
+		$this->set->set_user_id(0);
 	}
 }

@@ -159,7 +159,7 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 					'album_desc'		=> '',
 				), $this->updated_data);
 
-				$this->data['album_id'] = (int) $this->nestedset->insert($this->updated_data);
+				$this->data['album_id'] = (int) $this->nestedset->insert($album_data);
 				$this->id = $this->data['album_id'];
 			}
 

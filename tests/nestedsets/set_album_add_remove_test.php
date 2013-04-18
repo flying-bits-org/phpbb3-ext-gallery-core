@@ -102,7 +102,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_add_remove_test extends phpbb
 	*/
 	public function test_remove_add($album_id, $expected_removed, $expected_remove_table, $expected_added, $expected_add_table)
 	{
-		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
+		$album = new phpbb_ext_gallery_core_album_nestedsetitem($this->album_data[$album_id]);
 
 		$removed_items = $this->set->remove($album);
 
@@ -116,7 +116,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_add_remove_test extends phpbb
 		$added_items = array();
 		foreach ($removed_items as $item_id)
 		{
-			$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$item_id]);
+			$album = new phpbb_ext_gallery_core_album_nestedsetitem($this->album_data[$item_id]);
 			$added_items[$item_id] = $this->set->add($album);
 		}
 		$this->assertEquals($expected_added, $added_items);
@@ -172,7 +172,7 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_add_remove_test extends phpbb
 	*/
 	public function test_delete($album_id, $expected_deleted, $expected)
 	{
-		$album = new phpbb_ext_gallery_core_nestedsets_item_album($this->album_data[$album_id]);
+		$album = new phpbb_ext_gallery_core_album_nestedsetitem($this->album_data[$album_id]);
 
 		$this->assertEquals($expected_deleted, $this->set->delete($album));
 

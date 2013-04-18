@@ -91,10 +91,7 @@ class phpbb_ext_gallery_core_album_factory
 		{
 			throw new phpbb_ext_gallery_core_exception('GALLERY_ALBUM_TYPE_NOT_EXIST');
 		}
-
-		$type_object = $this->container->get('gallery.album.type.' . $type);
-		$type_class = get_class($type_object);
-		return new $type_class($this->db, $this->table_name);
+		return $this->container->get('gallery.album.type.' . $type);
 	}
 
 	/**
