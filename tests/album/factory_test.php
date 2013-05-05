@@ -57,8 +57,8 @@ class phpbb_ext_gallery_tests_album_factory_test extends phpbb_ext_gallery_datab
 	}
 
 	/**
-	* @expectedException			phpbb_ext_gallery_core_exception
-	* @expectedExceptionMessage		GALLERY_ALBUM_TYPE_NOT_EXIST
+	* @expectedException			OutOfBoundsException
+	* @expectedExceptionMessage		GALLERY_ALBUM_INVALID_PARENT
 	*/
 	public function test_create_not_exist()
 	{
@@ -73,8 +73,8 @@ class phpbb_ext_gallery_tests_album_factory_test extends phpbb_ext_gallery_datab
 	}
 
 	/**
-	* @expectedException			phpbb_ext_gallery_core_exception
-	* @expectedExceptionMessage		GALLERY_ALBUM_NOT_EXIST
+	* @expectedException			OutOfBoundsException
+	* @expectedExceptionMessage		GALLERY_ALBUM_INVALID_PARENT
 	*/
 	public function test_get_not_exist()
 	{
@@ -82,8 +82,8 @@ class phpbb_ext_gallery_tests_album_factory_test extends phpbb_ext_gallery_datab
 	}
 
 	/**
-	* @expectedException			phpbb_ext_gallery_core_exception
-	* @expectedExceptionMessage		GALLERY_ALBUM_TYPE_NOT_EXIST
+	* @expectedException			OutOfBoundsException
+	* @expectedExceptionMessage		GALLERY_ALBUM_INVALID_PARENT
 	*/
 	public function test_get_type_not_exist()
 	{

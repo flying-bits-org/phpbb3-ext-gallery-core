@@ -67,7 +67,7 @@ class phpbb_ext_gallery_core_album_factory
 
 		if ($row === false)
 		{
-			throw new phpbb_ext_gallery_core_exception('GALLERY_ALBUM_NOT_EXIST');
+			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_ITEM');
 		}
 
 		$album = $this->create($row['album_type']);
