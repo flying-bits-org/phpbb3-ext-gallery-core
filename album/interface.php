@@ -21,7 +21,7 @@ interface phpbb_ext_gallery_core_album_interface
 	* Set the data values for this album
 	*
 	* @param	array	$row	Should contain all data from the albums table
-	* @return	mixed
+	* @return	null
 	*/
 	public function set_datarow(array $row);
 
@@ -62,6 +62,15 @@ interface phpbb_ext_gallery_core_album_interface
 	* @return	bool		True, if any values were written
 	*/
 	public function submit();
+
+	/**
+	* Delete an album
+	*
+	* Also deletes the subalbums
+	*
+	* @return array		Album ids that have been deleted
+	*/
+	public function delete();
 
 	/**
 	* Identifier of the album type.

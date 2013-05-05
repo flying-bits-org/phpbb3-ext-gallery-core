@@ -183,6 +183,19 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 	}
 
 	/**
+	* @inheritdoc
+	*/
+	public function delete()
+	{
+		if (!$this->id)
+		{
+			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_ITEM');
+		}
+
+		return $this->nestedset->delete($this->id);
+	}
+
+	/**
 	* Move an item by a given delta
 	*
 	* @param int	$delta	Number of steps to move this item, < 0 => down, > 0 => up
