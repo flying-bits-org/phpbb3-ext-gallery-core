@@ -93,7 +93,7 @@ class phpbb_ext_gallery_tests_tree_nestedset_album_base extends phpbb_ext_galler
 
 	protected function create_album($name, $parent_id = 0)
 	{
-		$album = $this->set->insert(array('album_name' => $name, 'album_desc' => ''));
+		$album = $this->set->insert(array('album_name' => $name, 'album_type' => 'category', 'album_desc' => ''));
 		$this->set->change_parent($album['album_id'], $parent_id);
 	}
 }
