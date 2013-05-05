@@ -54,7 +54,7 @@ class phpbb_ext_gallery_core_album_factory
 	* @return	mixed		Returns an instance of
 	*				phpbb_ext_gallery_core_album_interface for the given album
 	*
-	* @throws	phpbb_ext_gallery_core_exception	If the album does not exist or the type could not be found
+	* @throws	OutOfBoundsException	If the album does not exist or the type could not be found
 	*/
 	public function get($album_id)
 	{
@@ -83,13 +83,13 @@ class phpbb_ext_gallery_core_album_factory
 	* @return	mixed		Returns an instance of
 	*				phpbb_ext_gallery_core_album_interface for the given type
 	*
-	* @throws	phpbb_ext_gallery_core_exception	If the type could not be found
+	* @throws	OutOfBoundsException	If the type could not be found
 	*/
 	public function create($type)
 	{
 		if (!$this->container->has('gallery.album.type.' . $type))
 		{
-			throw new phpbb_ext_gallery_core_exception('GALLERY_ALBUM_TYPE_NOT_EXIST');
+			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_TYPE');
 		}
 		return $this->container->get('gallery.album.type.' . $type);
 	}
