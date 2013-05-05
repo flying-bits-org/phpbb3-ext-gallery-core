@@ -87,11 +87,22 @@ class phpbb_ext_gallery_core_album_factory
 	*/
 	public function create($type)
 	{
-		if (!$this->container->has('gallery.album.type.' . $type))
+		if (!$this->validate_type($type))
 		{
 			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_TYPE');
 		}
 		return $this->container->get('gallery.album.type.' . $type);
+	}
+
+	/**
+	* Validates whether a given type is a valid album type
+	*
+	* @param	string		$type	Type to validate
+	* @return	bool	Is the type valid?
+	*/
+	public function validate_type($type)
+	{
+		return $this->container->has('gallery.album.type.' . $type);
 	}
 
 	/**

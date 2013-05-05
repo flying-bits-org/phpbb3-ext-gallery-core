@@ -89,4 +89,20 @@ class phpbb_ext_gallery_tests_album_factory_test extends phpbb_ext_gallery_datab
 	{
 		$this->factory->get(2);
 	}
+
+	public function validate_type_data()
+	{
+		return array(
+			array('category', true),
+			array('does_not_exist', false),
+		);
+	}
+
+	/**
+	* @dataProvider validate_type_data
+	*/
+	public function test_validate_type($type, $expected)
+	{
+		$this->assertEquals($expected, $this->factory->validate_type($type));
+	}
 }
