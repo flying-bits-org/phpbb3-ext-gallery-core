@@ -21,7 +21,7 @@ interface phpbb_ext_gallery_core_album_interface
 	* Set the data values for this album
 	*
 	* @param	array	$row	Should contain all data from the albums table
-	* @return	mixed
+	* @return	null
 	*/
 	public function set_datarow(array $row);
 
@@ -64,6 +64,94 @@ interface phpbb_ext_gallery_core_album_interface
 	public function submit();
 
 	/**
+	* Delete an album
+	*
+	* Also deletes the subalbums
+	*
+	* @return array		Album ids that have been deleted
+	*/
+	public function delete();
+
+	/**
+	* Move an item by a given delta
+	*
+	* @param int	$delta	Number of steps to move this item, < 0 => down, > 0 => up
+	* @return bool True if the item was moved
+	*/
+	public function move($delta);
+
+	/**
+	* Move an item down by 1
+	*
+	* @return bool True if the item was moved
+	*/
+	public function move_down();
+
+	/**
+	* Move an item up by 1
+	*
+	* @return bool True if the item was moved
+	*/
+	public function move_up();
+
+	/**
+	* Moves all children of one item to another item
+	*
+	* @param int	$new_parent_id		The new parent item
+	* @return bool True if any items where moved
+	*/
+	public function move_children($new_parent_id);
+
+	/**
+	* Set the parent item
+	*
+	* @param int	$new_parent_id		The new parent item
+	* @return bool True if the parent was set successfully
+	*/
+	public function change_parent($new_parent_id);
+
+	/**
+	* Get all items that are either ancestors or descendants of the album
+	*
+	* @param bool		$order_asc		Order the items ascendingly (most outer ancestor first)
+	* @param bool		$include_album	Should the album matching the given album id be included in the list as well
+	* @return array			Array of items (containing all columns from the album table)
+	*							ID => album data
+	*/
+	public function get_path_and_subtree_data($order_asc, $include_album);
+
+	/**
+	* Get all of the album's ancestors
+	*
+	* @param bool		$order_asc		Order the items ascendingly (most outer ancestor first)
+	* @param bool		$include_album	Should the album matching the given album id be included in the list as well
+	* @return array			Array of items (containing all columns from the album table)
+	*							ID => album data
+	*/
+	public function get_path_data($order_asc, $include_album);
+
+	/**
+	* Get all of the album's descendants
+	*
+	* @param bool		$order_asc		Order the items ascendingly
+	* @param bool		$include_album	Should the album matching the given album id be included in the list as well
+	* @return array			Array of items (containing all columns from the album table)
+	*							ID => album data
+	*/
+	public function get_subtree_data($order_asc, $include_album);
+
+	/**
+	* Get basic data of all parent albums
+	*
+	* Basic data is defined in the $item_basic_data property.
+	* Data is cached in the album_parents column in the album table
+	*
+	* @return array			Array of albums (containing basic columns from the album table)
+	*							ID => album data
+	*/
+	public function get_path_basic_data();
+
+	/**
 	* Identifier of the album type.
 	* A service with the name "gallery.album.type.<id>" must exist
 	*
@@ -77,4 +165,23 @@ interface phpbb_ext_gallery_core_album_interface
 	* @return string
 	*/
 	public function get_type_name();
+
+	/**
+	* Can the album contain images?
+	*
+	* This method is used, to check when an album type is changed.
+	* For example when an album allows to upload images in the future, or did
+	* allow to upload images in the past, but not at the moment, it can still
+	* contain images while changing the type to this type.
+	*
+	* @return	bool
+	*/
+	public function can_contain_images();
+
+	/**
+	* Can new images be uploaded to the album?
+	*
+	* @return	bool
+	*/
+	public function can_upload_images();
 }

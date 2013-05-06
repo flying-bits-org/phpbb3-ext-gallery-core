@@ -17,8 +17,17 @@ if (!defined('IN_PHPBB'))
 
 abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_core_album_interface
 {
+	/** @var phpbb_db_driver */
+	protected $db;
+
+	/** @var phpbb_ext_gallery_core_album_nestedset */
+	protected $nestedset;
+
 	/** @var int */
 	protected $id;
+
+	/** @var int */
+	protected $user_id;
 
 	/** @var array(field => value) */
 	protected $data;
@@ -35,11 +44,13 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 	* the dependencies defined in the services.yml file for this service.
 	*
 	* @param phpbb_db_driver	$db			Database object
+	* @param phpbb_ext_gallery_core_album_nestedset	$nestedset	Nestedset to manage the album trees
 	* @param string				$table_name	Database table name
 	*/
-	public function __construct(phpbb_db_driver $db, $table_name)
+	public function __construct(phpbb_db_driver $db, phpbb_ext_gallery_core_album_nestedset $nestedset, $table_name)
 	{
 		$this->db = $db;
+		$this->nestedset = $nestedset;
 		$this->table_name = $table_name;
 		$this->data = $this->updated_data = array();
 	}
@@ -50,6 +61,7 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 	public function set_datarow(array $row)
 	{
 		$this->id = $row['album_id'];
+		$this->user_id = $row['user_id'];
 		$this->data = $row;
 	}
 
@@ -76,9 +88,15 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 	*/
 	public function set($key, $value)
 	{
-		if ($key === 'album_id' || $key === 'id')
+		if (in_array($key, array('album_id', 'id', 'left_id', 'right_id', 'album_parents')))
 		{
-			// Do not allow to set the album_id manually.
+			// Do not allow to set the album_id and nestedset values manually.
+			throw new phpbb_ext_gallery_core_exception('GALLERY_ALBUM_CANNOT_SET_VALUE');
+		}
+
+		if (!is_null($this->id) && $key === 'user_id')
+		{
+			// Do not allow to set the user_id manually, if the album already exists.
 			throw new phpbb_ext_gallery_core_exception('GALLERY_ALBUM_CANNOT_SET_VALUE');
 		}
 
@@ -113,6 +131,16 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 	*/
 	public function submit()
 	{
+		$updated_data = false;
+		$this->nestedset->set_user_id($this->user_id);
+
+		$parent_id = null;
+		if (isset($this->updated_data['parent_id']))
+		{
+			$parent_id = (int) $this->updated_data['parent_id'];
+			unset($this->updated_data['parent_id']);
+		}
+
 		if (!empty($this->updated_data))
 		{
 			if ($this->id)
@@ -131,19 +159,157 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 					'album_desc'		=> '',
 				), $this->updated_data);
 
-				$sql = 'INSERT INTO ' . $this->table_name . ' ' . $this->db->sql_build_array('INSERT', $album_data);
-				$this->db->sql_query($sql);
-
-				$this->data['album_id'] = (int) $this->db->sql_nextid();
+				$this->data['album_id'] = (int) $this->nestedset->insert($album_data);
 				$this->id = $this->data['album_id'];
 			}
 
 			$this->updated_data = array();
-
-			return true;
+			$updated_data = true;
 		}
 
-		return false;
+		if (!is_null($parent_id))
+		{
+			//$this->nestedset->set_parent($this->data, $parent_id);
+			$this->nestedset->set_parent(new phpbb_ext_gallery_core_album_nestedsetitem($this->data), new phpbb_ext_gallery_core_album_nestedsetitem(array(
+				'album_id'	=> $parent_id,
+				'parent_id'	=> 0,
+				'left_id'	=> 0,
+				'right_id'	=> 0,
+				'user_id'	=> $this->user_id,
+			)));
+		}
+
+		return $updated_data;
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function delete()
+	{
+		if (!$this->id)
+		{
+			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_ITEM');
+		}
+
+		return $this->nestedset->delete($this->id);
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function move($delta)
+	{
+		if (!$this->id)
+		{
+			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_ITEM');
+		}
+
+		return $this->nestedset->move($this->id, $delta);
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function move_down()
+	{
+		if (!$this->id)
+		{
+			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_ITEM');
+		}
+
+		return $this->nestedset->move_down($this->id);
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function move_up()
+	{
+		if (!$this->id)
+		{
+			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_ITEM');
+		}
+
+		return $this->nestedset->move_up($this->id);
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function move_children($new_parent_id)
+	{
+		if (!$this->id)
+		{
+			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_ITEM');
+		}
+
+		return $this->nestedset->move_children($this->id, (int) $new_parent_id);
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function change_parent($new_parent_id)
+	{
+		if (!$this->id)
+		{
+			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_ITEM');
+		}
+
+		return $this->nestedset->change_parent($this->id, (int) $new_parent_id);
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function get_path_and_subtree_data($order_asc, $include_album)
+	{
+		if (!$this->id)
+		{
+			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_ITEM');
+		}
+
+		return $this->nestedset->get_path_and_subtree_data($this->id, (bool) $order_asc, (bool) $include_album);
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function get_path_data($order_asc, $include_album)
+	{
+		if (!$this->id)
+		{
+			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_ITEM');
+		}
+
+		return $this->nestedset->get_path_data($this->id, (bool) $order_asc, (bool) $include_album);
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function get_subtree_data($order_asc, $include_album)
+	{
+		if (!$this->id)
+		{
+			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_ITEM');
+		}
+
+		return $this->nestedset->get_subtree_data($this->id, (bool) $order_asc, (bool) $include_album);
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function get_path_basic_data()
+	{
+		if (!$this->id)
+		{
+			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_ITEM');
+		}
+
+		return $this->nestedset->get_path_basic_data($this->data);
 	}
 
 	/**

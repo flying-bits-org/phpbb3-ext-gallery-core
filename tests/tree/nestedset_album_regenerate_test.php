@@ -7,9 +7,9 @@
 *
 */
 
-require_once dirname(__FILE__) . '/set_album_base.php';
+require_once dirname(__FILE__) . '/nestedset_album_base.php';
 
-class phpbb_ext_gallery_tests_nestedsets_set_album_recalculate_test extends phpbb_ext_gallery_tests_nestedsets_set_album_base
+class phpbb_ext_gallery_tests_tree_nestedset_album_recalculate_test extends phpbb_ext_gallery_tests_tree_nestedset_album_base
 {
 	protected $fixed_set = array(
 		array('album_id' => 1, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
@@ -26,17 +26,12 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_recalculate_test extends phpb
 		array('album_id' => 10, 'parent_id' => 9, 'user_id' => 0, 'left_id' => 17, 'right_id' => 18, 'album_parents' => ''),
 		array('album_id' => 11, 'parent_id' => 7, 'user_id' => 0, 'left_id' => 20, 'right_id' => 21, 'album_parents' => ''),
 
-		array('album_id' => 12, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 23, 'right_id' => 24, 'album_parents' => ''),
-		array('album_id' => 13, 'parent_id' => 0, 'user_id' => 0, 'left_id' => 25, 'right_id' => 26, 'album_parents' => ''),
-
-		array('album_id' => 14, 'parent_id' => 0, 'user_id' => 2, 'left_id' => 1, 'right_id' => 2, 'album_parents' => ''),
-
-		array('album_id' => 15, 'parent_id' => 0, 'user_id' => 3, 'left_id' => 1, 'right_id' => 6, 'album_parents' => ''),
-		array('album_id' => 16, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 2, 'right_id' => 3, 'album_parents' => ''),
-		array('album_id' => 17, 'parent_id' => 15, 'user_id' => 3, 'left_id' => 4, 'right_id' => 5, 'album_parents' => ''),
+		array('album_id' => 12, 'parent_id' => 0, 'user_id' => 2, 'left_id' => 1, 'right_id' => 6, 'album_parents' => 'a:0:{}'),
+		array('album_id' => 13, 'parent_id' => 12, 'user_id' => 2, 'left_id' => 2, 'right_id' => 3, 'album_parents' => 'a:0:{}'),
+		array('album_id' => 14, 'parent_id' => 12, 'user_id' => 2, 'left_id' => 4, 'right_id' => 5, 'album_parents' => 'a:0:{}'),
 	);
 
-	public function recalculate_nested_set_data()
+	public function regenerate_left_right_ids_data()
 	{
 		return array(
 			array('UPDATE phpbb_gallery_albums
@@ -71,13 +66,13 @@ class phpbb_ext_gallery_tests_nestedsets_set_album_recalculate_test extends phpb
 	}
 
 	/**
-	* @dataProvider recalculate_nested_set_data
+	* @dataProvider regenerate_left_right_ids_data
 	*/
-	public function test_recalculate_nested_set($breaking_query, $reset_ids)
+	public function test_regenerate_left_right_ids($breaking_query, $reset_ids)
 	{
 		$result = $this->db->sql_query($breaking_query);
 
-		$this->assertEquals(27, $this->set->recalculate_nested_set(1, 0, $reset_ids));
+		$this->assertEquals(23, $this->set->regenerate_left_right_ids(1, 0, $reset_ids));
 
 		$result = $this->db->sql_query('SELECT album_id, parent_id, user_id, left_id, right_id, album_parents
 			FROM phpbb_gallery_albums
