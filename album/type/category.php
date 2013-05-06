@@ -15,14 +15,14 @@ if (!defined('IN_PHPBB'))
 	exit;
 }
 
-class phpbb_mock_gallery_core_album_type_base extends phpbb_ext_gallery_core_album_base
+class phpbb_ext_gallery_core_album_type_category extends phpbb_ext_gallery_core_album_base
 {
 	/**
 	* @inheritdoc
 	*/
 	public function get_type_id()
 	{
-		return 'base';
+		return 'category';
 	}
 
 	/**
@@ -30,7 +30,7 @@ class phpbb_mock_gallery_core_album_type_base extends phpbb_ext_gallery_core_alb
 	*/
 	public function get_type_name()
 	{
-		return 'BASE';
+		return 'GALLERY_ALBUM_TYPE_CATEGORY';
 	}
 
 	/**

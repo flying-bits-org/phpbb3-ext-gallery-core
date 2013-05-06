@@ -15,14 +15,14 @@ if (!defined('IN_PHPBB'))
 	exit;
 }
 
-class phpbb_ext_gallery_core_album_category extends phpbb_ext_gallery_core_album_base
+class phpbb_ext_gallery_core_album_type_album extends phpbb_ext_gallery_core_album_base
 {
 	/**
 	* @inheritdoc
 	*/
 	public function get_type_id()
 	{
-		return 'category';
+		return 'album';
 	}
 
 	/**
@@ -30,6 +30,22 @@ class phpbb_ext_gallery_core_album_category extends phpbb_ext_gallery_core_album
 	*/
 	public function get_type_name()
 	{
-		return 'GALLERY_ALBUM_TYPE_CATEGORY';
+		return 'GALLERY_ALBUM_TYPE_ALBUM';
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function can_contain_images()
+	{
+		return true;
+	}
+
+	/**
+	* @inheritdoc
+	*/
+	public function can_upload_images()
+	{
+		return true;
 	}
 }

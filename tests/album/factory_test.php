@@ -30,10 +30,10 @@ class phpbb_ext_gallery_tests_album_factory_test extends phpbb_ext_gallery_datab
 		$container->set('gallery.album.nestedset', $nestedset);
 
 		$type_collection = array();
-		$types = array('category');
+		$types = array('album', 'category');
 		foreach ($types as $type)
 		{
-			$class_name = 'phpbb_ext_gallery_core_album_' . $type;
+			$class_name = 'phpbb_ext_gallery_core_album_type_' . $type;
 			$type_class = new $class_name($this->db, $nestedset, 'phpbb_gallery_albums');
 			$type_collection[] = $type_class;
 			$container->set('gallery.album.type.' . $type, $type_class);
@@ -47,13 +47,25 @@ class phpbb_ext_gallery_tests_album_factory_test extends phpbb_ext_gallery_datab
 	public function test_get_types()
 	{
 		$this->assertEquals(array(
-			'category' => 'GALLERY_ALBUM_TYPE_CATEGORY',
+			'album'		=> 'GALLERY_ALBUM_TYPE_ALBUM',
+			'category'	=> 'GALLERY_ALBUM_TYPE_CATEGORY',
 		), $this->factory->get_types());
 	}
 
-	public function test_create()
+	public function create_data()
 	{
-		$this->assertInstanceOf('phpbb_ext_gallery_core_album_category', $this->factory->create('category'));
+		return array(
+			array('album'),
+			array('category'),
+		);
+	}
+
+	/**
+	* @dataProvider create_data
+	*/
+	public function test_create($type)
+	{
+		$this->assertInstanceOf('phpbb_ext_gallery_core_album_type_' . $type, $this->factory->create($type));
 	}
 
 	/**
@@ -68,7 +80,7 @@ class phpbb_ext_gallery_tests_album_factory_test extends phpbb_ext_gallery_datab
 	public function test_get()
 	{
 		$album = $this->factory->get(1);
-		$this->assertInstanceOf('phpbb_ext_gallery_core_album_category', $album);
+		$this->assertInstanceOf('phpbb_ext_gallery_core_album_type_category', $album);
 		$this->assertEquals(1, $album->get('id'));
 	}
 

@@ -165,4 +165,23 @@ interface phpbb_ext_gallery_core_album_interface
 	* @return string
 	*/
 	public function get_type_name();
+
+	/**
+	* Can the album contain images?
+	*
+	* This method is used, to check when an album type is changed.
+	* For example when an album allows to upload images in the future, or did
+	* allow to upload images in the past, but not at the moment, it can still
+	* contain images while changing the type to this type.
+	*
+	* @return	bool
+	*/
+	public function can_contain_images();
+
+	/**
+	* Can new images be uploaded to the album?
+	*
+	* @return	bool
+	*/
+	public function can_upload_images();
 }

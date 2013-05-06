@@ -26,7 +26,7 @@ class phpbb_ext_gallery_tests_album_nestedset_base extends phpbb_ext_gallery_tes
 		$types = array('category');
 		foreach ($types as $type)
 		{
-			$class_name = 'phpbb_ext_gallery_core_album_' . $type;
+			$class_name = 'phpbb_ext_gallery_core_album_type_' . $type;
 			$type_class = new $class_name($this->db, $this->set, 'phpbb_gallery_albums');
 			$type_collection[] = $type_class;
 			$this->container->set('gallery.album.type.' . $type, $type_class);

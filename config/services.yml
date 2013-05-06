@@ -31,8 +31,17 @@ services:
         tags:
             - { name: service_collection, tag: gallery.album.type }
 
+    gallery.album.type.album:
+        class: phpbb_ext_gallery_core_album_type_album
+        scope: prototype
+        arguments:
+            - @dbal.conn
+            - %tables.gallery.albums%
+        tags:
+            - { name: gallery.album.type }
+
     gallery.album.type.category:
-        class: phpbb_ext_gallery_core_album_category
+        class: phpbb_ext_gallery_core_album_type_category
         scope: prototype
         arguments:
             - @dbal.conn
