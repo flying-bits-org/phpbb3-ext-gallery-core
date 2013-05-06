@@ -20,7 +20,12 @@ class phpbb_ext_gallery_tests_album_base_test extends phpbb_ext_gallery_database
 	{
 		parent::setUp();
 
-		$this->album = new phpbb_mock_gallery_core_album_type_base($this->db, 'phpbb_gallery_albums');
+		$config = new phpbb_config(array('phpbb_gallery_album_lock' => 0));
+		set_config(null, null, null, $config);
+		$lock = new phpbb_lock_db('phpbb_gallery_album_lock', $config, $this->db);
+		$this->nestedset = new phpbb_ext_gallery_core_album_nestedset($this->db, $lock, 'phpbb_gallery_albums');
+		$this->nestedset->set_user_id(0);
+		$this->album = new phpbb_mock_gallery_core_album_type_base($this->db, $this->nestedset, 'phpbb_gallery_albums');
 	}
 
 	public function get_data()

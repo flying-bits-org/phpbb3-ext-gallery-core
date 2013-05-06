@@ -23,12 +23,18 @@ class phpbb_ext_gallery_tests_album_factory_test extends phpbb_ext_gallery_datab
 		// Container
 		$container = new phpbb_mock_container_builder();
 
+		$config = new phpbb_config(array('phpbb_gallery_album_lock' => 0));
+		set_config(null, null, null, $config);
+		$lock = new phpbb_lock_db('phpbb_gallery_album_lock', $config, $this->db);
+		$nestedset = new phpbb_ext_gallery_core_album_nestedset($this->db, $lock, 'phpbb_gallery_albums');
+		$container->set('gallery.album.nestedset', $nestedset);
+
 		$type_collection = array();
-		$types = array('category');
+		$types = array('album', 'category');
 		foreach ($types as $type)
 		{
-			$class_name = 'phpbb_ext_gallery_core_album_' . $type;
-			$type_class = new $class_name($this->db, 'phpbb_gallery_albums');
+			$class_name = 'phpbb_ext_gallery_core_album_type_' . $type;
+			$type_class = new $class_name($this->db, $nestedset, 'phpbb_gallery_albums');
 			$type_collection[] = $type_class;
 			$container->set('gallery.album.type.' . $type, $type_class);
 		}
@@ -41,46 +47,74 @@ class phpbb_ext_gallery_tests_album_factory_test extends phpbb_ext_gallery_datab
 	public function test_get_types()
 	{
 		$this->assertEquals(array(
-			'category' => 'GALLERY_ALBUM_TYPE_CATEGORY',
+			'album'		=> 'GALLERY_ALBUM_TYPE_ALBUM',
+			'category'	=> 'GALLERY_ALBUM_TYPE_CATEGORY',
 		), $this->factory->get_types());
 	}
 
-	public function test_create()
+	public function create_data()
 	{
-		$this->assertInstanceOf('phpbb_ext_gallery_core_album_category', $this->factory->create('category'));
+		return array(
+			array('album'),
+			array('category'),
+		);
 	}
 
 	/**
-	* @expectedException			phpbb_ext_gallery_core_exception
-	* @expectedExceptionMessage		GALLERY_ALBUM_TYPE_NOT_EXIST
+	* @dataProvider create_data
+	*/
+	public function test_create($type)
+	{
+		$this->assertInstanceOf('phpbb_ext_gallery_core_album_type_' . $type, $this->factory->create($type));
+	}
+
+	/**
+	* @expectedException			OutOfBoundsException
+	* @expectedExceptionMessage		GALLERY_ALBUM_INVALID_TYPE
 	*/
 	public function test_create_not_exist()
 	{
-		$this->assertInstanceOf('phpbb_ext_gallery_core_album_category', $this->factory->create('does_not_exist'));
+		$this->factory->create('does_not_exist');
 	}
 
 	public function test_get()
 	{
 		$album = $this->factory->get(1);
-		$this->assertInstanceOf('phpbb_ext_gallery_core_album_category', $album);
+		$this->assertInstanceOf('phpbb_ext_gallery_core_album_type_category', $album);
 		$this->assertEquals(1, $album->get('id'));
 	}
 
 	/**
-	* @expectedException			phpbb_ext_gallery_core_exception
-	* @expectedExceptionMessage		GALLERY_ALBUM_NOT_EXIST
+	* @expectedException			OutOfBoundsException
+	* @expectedExceptionMessage		GALLERY_ALBUM_INVALID_ITEM
 	*/
 	public function test_get_not_exist()
 	{
-		$album = $this->factory->get(3);
+		$this->factory->get(3);
 	}
 
 	/**
-	* @expectedException			phpbb_ext_gallery_core_exception
-	* @expectedExceptionMessage		GALLERY_ALBUM_TYPE_NOT_EXIST
+	* @expectedException			OutOfBoundsException
+	* @expectedExceptionMessage		GALLERY_ALBUM_INVALID_TYPE
 	*/
 	public function test_get_type_not_exist()
 	{
-		$album = $this->factory->get(2);
+		$this->factory->get(2);
+	}
+
+	public function validate_type_data()
+	{
+		return array(
+			array('category', true),
+			array('does_not_exist', false),
+		);
+	}
+
+	/**
+	* @dataProvider validate_type_data
+	*/
+	public function test_validate_type($type, $expected)
+	{
+		$this->assertEquals($expected, $this->factory->validate_type($type));
 	}
 }

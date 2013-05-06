@@ -54,7 +54,7 @@ class phpbb_ext_gallery_core_album_factory
 	* @return	mixed		Returns an instance of
 	*				phpbb_ext_gallery_core_album_interface for the given album
 	*
-	* @throws	phpbb_ext_gallery_core_exception	If the album does not exist or the type could not be found
+	* @throws	OutOfBoundsException	If the album does not exist or the type could not be found
 	*/
 	public function get($album_id)
 	{
@@ -67,7 +67,7 @@ class phpbb_ext_gallery_core_album_factory
 
 		if ($row === false)
 		{
-			throw new phpbb_ext_gallery_core_exception('GALLERY_ALBUM_NOT_EXIST');
+			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_ITEM');
 		}
 
 		$album = $this->create($row['album_type']);
@@ -83,18 +83,26 @@ class phpbb_ext_gallery_core_album_factory
 	* @return	mixed		Returns an instance of
 	*				phpbb_ext_gallery_core_album_interface for the given type
 	*
-	* @throws	phpbb_ext_gallery_core_exception	If the type could not be found
+	* @throws	OutOfBoundsException	If the type could not be found
 	*/
 	public function create($type)
 	{
-		if (!$this->container->has('gallery.album.type.' . $type))
+		if (!$this->validate_type($type))
 		{
-			throw new phpbb_ext_gallery_core_exception('GALLERY_ALBUM_TYPE_NOT_EXIST');
+			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_TYPE');
 		}
+		return $this->container->get('gallery.album.type.' . $type);
+	}
 
-		$type_object = $this->container->get('gallery.album.type.' . $type);
-		$type_class = get_class($type_object);
-		return new $type_class($this->db, $this->table_name);
+	/**
+	* Validates whether a given type is a valid album type
+	*
+	* @param	string		$type	Type to validate
+	* @return	bool	Is the type valid?
+	*/
+	public function validate_type($type)
+	{
+		return $this->container->has('gallery.album.type.' . $type);
 	}
 
 	/**
