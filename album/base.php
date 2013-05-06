@@ -196,10 +196,7 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 	}
 
 	/**
-	* Move an item by a given delta
-	*
-	* @param int	$delta	Number of steps to move this item, < 0 => down, > 0 => up
-	* @return bool True if the item was moved
+	* @inheritdoc
 	*/
 	public function move($delta)
 	{
@@ -212,9 +209,7 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 	}
 
 	/**
-	* Move an item down by 1
-	*
-	* @return bool True if the item was moved
+	* @inheritdoc
 	*/
 	public function move_down()
 	{
@@ -227,9 +222,7 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 	}
 
 	/**
-	* Move an item up by 1
-	*
-	* @return bool True if the item was moved
+	* @inheritdoc
 	*/
 	public function move_up()
 	{
@@ -242,10 +235,7 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 	}
 
 	/**
-	* Moves all children of one item to another item
-	*
-	* @param int	$new_parent_id		The new parent item
-	* @return bool True if any items where moved
+	* @inheritdoc
 	*/
 	public function move_children($new_parent_id)
 	{
@@ -258,10 +248,7 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 	}
 
 	/**
-	* Set the parent item
-	*
-	* @param int	$new_parent_id		The new parent item
-	* @return bool True if the parent was set successfully
+	* @inheritdoc
 	*/
 	public function change_parent($new_parent_id)
 	{
@@ -274,67 +261,46 @@ abstract class phpbb_ext_gallery_core_album_base implements phpbb_ext_gallery_co
 	}
 
 	/**
-	* Get all items that are either ancestors or descendants of the album
-	*
-	* @param bool		$order_asc		Order the items ascendingly (most outer ancestor first)
-	* @param bool		$include_item	Should the album matching the given album id be included in the list as well
-	* @return array			Array of items (containing all columns from the album table)
-	*							ID => album data
+	* @inheritdoc
 	*/
-	public function get_path_and_subtree_data($order_asc, $include_item)
+	public function get_path_and_subtree_data($order_asc, $include_album)
 	{
 		if (!$this->id)
 		{
 			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_ITEM');
 		}
 
-		return $this->nestedset->get_path_and_subtree_data($this->id, (bool) $order_asc, (bool) $include_item);
+		return $this->nestedset->get_path_and_subtree_data($this->id, (bool) $order_asc, (bool) $include_album);
 	}
 
 	/**
-	* Get all of the album's ancestors
-	*
-	* @param bool		$order_asc		Order the items ascendingly (most outer ancestor first)
-	* @param bool		$include_item	Should the album matching the given album id be included in the list as well
-	* @return array			Array of items (containing all columns from the album table)
-	*							ID => album data
+	* @inheritdoc
 	*/
-	public function get_path_data($order_asc, $include_item)
+	public function get_path_data($order_asc, $include_album)
 	{
 		if (!$this->id)
 		{
 			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_ITEM');
 		}
 
-		return $this->nestedset->get_path_data($this->id, (bool) $order_asc, (bool) $include_item);
+		return $this->nestedset->get_path_data($this->id, (bool) $order_asc, (bool) $include_album);
 	}
 
 	/**
-	* Get all of the album's descendants
-	*
-	* @param bool		$order_asc		Order the items ascendingly
-	* @param bool		$include_item	Should the album matching the given album id be included in the list as well
-	* @return array			Array of items (containing all columns from the album table)
-	*							ID => album data
+	* @inheritdoc
 	*/
-	public function get_subtree_data($order_asc, $include_item)
+	public function get_subtree_data($order_asc, $include_album)
 	{
 		if (!$this->id)
 		{
 			throw new OutOfBoundsException('GALLERY_ALBUM_INVALID_ITEM');
 		}
 
-		return $this->nestedset->get_subtree_data($this->id, (bool) $order_asc, (bool) $include_item);
+		return $this->nestedset->get_subtree_data($this->id, (bool) $order_asc, (bool) $include_album);
 	}
 
 	/**
-	* Get basic data of all parent albums
-	*
-	* Basic data is defined in the $item_basic_data property.
-	* Data is cached in the album_parents column in the album table
-	*
-	* @return array			Array of albums (containing basic columns from the album table)
-	*							ID => album data
+	* @inheritdoc
 	*/
 	public function get_path_basic_data()
 	{
