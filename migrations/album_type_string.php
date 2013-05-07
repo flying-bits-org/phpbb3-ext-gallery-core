@@ -10,7 +10,7 @@
 class phpbb_ext_gallery_core_migrations_album_type_string extends phpbb_db_migration
 {
 	protected $type_conversion = array(
-		0	= 'category',
+		0	=> 'category',
 		1	=> 'upload',
 		2	=> 'contest',
 	);
@@ -19,11 +19,18 @@ class phpbb_ext_gallery_core_migrations_album_type_string extends phpbb_db_migra
 	{
 		$sql = 'SELECT 1 as not_updated
 			FROM ' . $this->table_prefix . 'gallery_albums
-			WHERE ' . $this->db->sql_in_set('album_type', array_keys($this->type_conversion);
+			WHERE ' . $this->db->sql_in_set('album_type', array_keys($this->type_conversion));
 		$result = $this->db->sql_query_limit($sql, 1);
 		$not_updated = $this->db->sql_fetchrow($result);
 		$this->db->sql_freeresult($result);
-		return !$not_updated;
+
+		$sql = 'SELECT 1 as is_not_empty
+			FROM ' . $this->table_prefix . 'gallery_albums';
+		$result = $this->db->sql_query_limit($sql, 1);
+		$is_not_empty = $this->db->sql_fetchrow($result);
+		$this->db->sql_freeresult($result);
+
+		return !$not_updated && $is_not_empty;
 	}
 
 	static public function depends_on()
