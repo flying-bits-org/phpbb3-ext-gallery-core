@@ -9,10 +9,6 @@ env:
   - DB=mysql
   - DB=postgres
 
-matrix:
-  allow_failures:
-    - php: 5.5
-
 before_script:
   # checkout phpBB and move your extension in place
   - cd ../../
