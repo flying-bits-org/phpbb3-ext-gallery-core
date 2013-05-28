@@ -23,7 +23,7 @@ before_script:
 
   # Setup the dependencies
   - cd phpBB3/phpBB
-  - php ../composer.phar install --dev
+  - php ../composer.phar install --dev --no-interaction --prefer-source
 
   # Setup the tests/travis
   - cd ext/gallery/core
